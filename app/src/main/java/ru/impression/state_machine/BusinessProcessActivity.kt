@@ -2,17 +2,16 @@ package ru.impression.state_machine
 
 import android.support.v7.app.AppCompatActivity
 
-abstract class BusinessProcessActivity : AppCompatActivity() {
+abstract class BusinessProcessActivity<E : Enum<E>, S : Enum<S>> : AppCompatActivity() {
 
-    var primaryState: BusinessProcess.State =
-        BusinessProcess.InitialState()
+    protected lateinit var primaryState: S
 
-    var currentState: BusinessProcess.State =
-        BusinessProcess.InitialState()
+    protected lateinit var currentState: S
 
-    abstract fun onStateUpdated(state: BusinessProcess.State)
+    abstract fun onStateUpdated()
 
-    fun makeEvent(event: BusinessProcess.Event) {
+    fun makeEvent(event: E) {
 
     }
+
 }

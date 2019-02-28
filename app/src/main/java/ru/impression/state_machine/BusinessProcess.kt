@@ -1,19 +1,17 @@
 package ru.impression.state_machine
 
-abstract class BusinessProcess {
+abstract class BusinessProcess<E : Enum<E>, S : Enum<S>> {
 
-    protected var primaryState: State =
-        InitialState()
+    protected lateinit var primaryState: S
 
-    protected var currentState: State =
-        InitialState()
+    protected lateinit var currentState: S
 
     abstract fun begin()
 
-    fun <E : Event> awaitEvent(awaiter: (E) -> Unit) {
+    fun awaitEvent(event: E, awaiter: () -> Unit) {
     }
 
-    fun updateState(state: State, setAsPrimary: Boolean = false) {
+    fun updateState(state: S, setAsPrimary: Boolean = false) {
         currentState = state
         if (setAsPrimary) {
             primaryState = state
@@ -23,10 +21,4 @@ abstract class BusinessProcess {
     fun end() {
 
     }
-
-    abstract class Event
-
-    abstract class State
-
-    class InitialState : State()
 }

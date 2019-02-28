@@ -1,73 +1,69 @@
 package ru.impression.state_machine.example.things_managing_process
 
 import ru.impression.state_machine.BusinessProcess
-import ru.impression.state_machine.example.things_managing_process.event.*
-import ru.impression.state_machine.example.things_managing_process.state.*
 
-class ThingsManagingProcess : BusinessProcess() {
+class ThingsManagingProcess : BusinessProcess<Event, State>() {
 
     override fun begin() {
 
-        updateState(LoadingFavouriteThings())
+        // загружаем любимые вещи
+        updateState(State.LOADING_FAVOURITE_THINGS)
 
-        awaitEvent<FavouriteThingsLoaded> {
+        // любимые вещи загружены
+        awaitEvent(Event.FAVOURITE_THINGS_LOADED) {
 
-            updateState(DisplayingOnlyFavouriteThings(it.things), true)
+            // устанавливаем в качестве основного состояния отображение только любимых вещей
+            updateState(State.DISPLAY_ONLY_FAVOURITE_THINGS, true)
 
-            manageFavouriteThings()
+            // пользователь запросил удалить любимую вещь
+            awaitEvent(Event.FAVOURITE_THING_UNLIKED) {
 
-            manageRecommendedThings()
-        }
-    }
+                // удаляем любимую вещь
+                updateState(State.DELETING_FAVOURITE_THING)
 
-    private fun manageFavouriteThings() =
+                // любимая вещь удалена
+                awaitEvent(Event.FAVOURITE_THING_DELETED) {
 
-        awaitEvent<FavouriteThingUnliked> {
-
-            updateState(DeletingFavouriteThing(it.thing))
-
-            awaitEvent<FavouriteThingDeleted> {
-
-                updateState(primaryState)
+                    // возвращаемся в основное состояние
+                    updateState(primaryState)
+                }
             }
-        }
 
-    private fun manageRecommendedThings() {
+            // пользователь запросил рекомендуемые вещи
+            awaitEvent(Event.RECOMMENDED_THINGS_REQUESTED) {
 
-        awaitEvent<RecommendedThingsLoadRequested> {
+                // загружаем рекомендуемые вещи
+                updateState(State.LOADING_RECOMMENDED_THINGS)
 
-            updateState(LoadingRecommendedThings())
+                // рекомендуемые вещи загружены
+                awaitEvent(Event.RECOMMENDED_THINGS_LOADED) {
 
-            awaitEvent<RecommendedThingsLoaded> {
+                    // устанавливаем в качестве основного состояния отображение любимых и понравившихся вещей
+                    updateState(State.DISPLAY_ALL_THINGS, true)
 
-                updateState(
-                    DisplayingAllThings(
-                        (primaryState as DisplayingOnlyFavouriteThings).things
-                    ),
-                    true
-                )
+                    // пользователю понравилась рекомендуемая вещь
+                    awaitEvent(Event.RECOMMENDED_THING_LIKED) {
 
-                awaitEvent<RecommendedThingLiked> {
+                        // добавляем понравившуюся вещь в любимые
+                        updateState(State.ADDING_THING_TO_FAVOURITES)
 
-                    updateState(AddingFavouriteThing())
+                        // понравившуюся вещь добавлена в любимые
+                        awaitEvent(Event.FAVOURITE_THING_ADDED) {
 
-                    awaitEvent<FavouriteThingAdded> {
-
-                        updateState(primaryState)
+                            // возвращаемся в основное состояние
+                            updateState(primaryState)
+                        }
                     }
                 }
             }
+
+            // пользователь запросил скрыть рекомендуемые вещи
+            awaitEvent(Event.RECOMMENDED_THINGS_HIDE_REQUESTED) {
+
+                // устанавливаем в качестве основного состояния отображение только любимых вещей
+                updateState(State.DISPLAY_ONLY_FAVOURITE_THINGS, true)
+            }
         }
-
-        awaitEvent<RecommendedThingsHideRequested> {
-
-            updateState(
-                DisplayingOnlyFavouriteThings(
-                    (primaryState as DisplayingAllThings).things
-                ),
-                true
-            )
-        }
-
     }
+
 }

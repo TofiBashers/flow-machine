@@ -2,16 +2,16 @@ package ru.impression.state_machine
 
 import android.support.v4.app.Fragment
 
-abstract class BusinessProcessFragment : Fragment() {
-    var primaryState: BusinessProcess.State =
-        BusinessProcess.InitialState()
+abstract class BusinessProcessFragment<E : Enum<E>, S : Enum<S>> : Fragment() {
 
-    var currentState: BusinessProcess.State =
-        BusinessProcess.InitialState()
+    protected lateinit var primaryState: S
 
-    abstract fun onStateUpdated(state: BusinessProcess.State)
+    protected lateinit var currentState: S
 
-    fun makeEvent(event: BusinessProcess.Event) {
+    abstract fun onStateUpdated()
+
+    fun makeEvent(event: E) {
 
     }
+
 }
