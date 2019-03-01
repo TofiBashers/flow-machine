@@ -2,20 +2,20 @@ package ru.impression.state_machine.example.things_managing_process.view.model
 
 import android.app.Application
 import ru.impression.state_machine.BusinessProcessViewModel
-import ru.impression.state_machine.example.things_managing_process.Event
-import ru.impression.state_machine.example.things_managing_process.State
+import ru.impression.state_machine.example.things_managing_process.ThingsManagingFlow
 import kotlin.concurrent.thread
 
-class ThingsManagingModel(application: Application) : BusinessProcessViewModel<Event, State>(application) {
+class ThingsManagingModel(application: Application) :
+    BusinessProcessViewModel<ThingsManagingFlow.Event, ThingsManagingFlow.State>(application) {
 
     lateinit var favouriteThings: ArrayList<String>
 
-    lateinit var thingToDelete: String
+    lateinit var favouriteThingToDelete: String
 
-    override fun onStateUpdated() {
-        when (currentState) {
-            State.LOADING_FAVOURITE_THINGS -> loadFavouriteThings()
-            State.DELETING_FAVOURITE_THING -> deleteFavouriteThing()
+    override fun onStateUpdated(oldState: ThingsManagingFlow.State, newState: ThingsManagingFlow.State) {
+        when (newState) {
+            ThingsManagingFlow.State.LOADING_FAVOURITE_THINGS -> loadFavouriteThings()
+            ThingsManagingFlow.State.DELETING_FAVOURITE_THING -> deleteFavouriteThing()
             else -> Unit
         }
     }
@@ -23,13 +23,13 @@ class ThingsManagingModel(application: Application) : BusinessProcessViewModel<E
     private fun loadFavouriteThings() = thread {
         Thread.sleep(1000)
         favouriteThings = arrayListOf("vodka", "spice", "bitches")
-        makeEvent(Event.FAVOURITE_THINGS_LOADED)
+        makeEvent(ThingsManagingFlow.Event.FAVOURITE_THINGS_LOADED)
     }
 
     private fun deleteFavouriteThing() = thread {
         Thread.sleep(1000)
-        favouriteThings.remove(thingToDelete)
-        makeEvent(Event.FAVOURITE_THING_DELETED)
+        favouriteThings.remove(favouriteThingToDelete)
+        makeEvent(ThingsManagingFlow.Event.FAVOURITE_THING_DELETED)
     }
 
 }

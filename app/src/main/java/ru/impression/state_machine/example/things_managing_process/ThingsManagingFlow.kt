@@ -1,28 +1,28 @@
 package ru.impression.state_machine.example.things_managing_process
 
-import ru.impression.state_machine.BusinessProcess
+import ru.impression.state_machine.Flow
 
-class ThingsManagingProcess : BusinessProcess<Event, State>() {
+class ThingsManagingFlow : Flow<ThingsManagingFlow.Event, ThingsManagingFlow.State>() {
 
-    override fun begin() {
+    override fun start() {
 
         // загружаем любимые вещи
         updateState(State.LOADING_FAVOURITE_THINGS)
 
         // любимые вещи загружены
-        awaitEvent(Event.FAVOURITE_THINGS_LOADED) {
+        subscribeOnEvent(Event.FAVOURITE_THINGS_LOADED) {
 
             // устанавливаем в качестве основного состояния отображение только любимых вещей
-            updateState(State.DISPLAY_ONLY_FAVOURITE_THINGS, true)
+            updateState(State.SHOWING_ONLY_FAVOURITE_THINGS, true)
 
             // пользователь запросил удалить любимую вещь
-            awaitEvent(Event.FAVOURITE_THING_UNLIKED) {
+            subscribeOnEvent(Event.FAVOURITE_THING_UNLIKED) {
 
                 // удаляем любимую вещь
                 updateState(State.DELETING_FAVOURITE_THING)
 
                 // любимая вещь удалена
-                awaitEvent(Event.FAVOURITE_THING_DELETED) {
+                subscribeOnEvent(Event.FAVOURITE_THING_DELETED) {
 
                     // возвращаемся в основное состояние
                     updateState(primaryState)
@@ -30,25 +30,25 @@ class ThingsManagingProcess : BusinessProcess<Event, State>() {
             }
 
             // пользователь запросил рекомендуемые вещи
-            awaitEvent(Event.RECOMMENDED_THINGS_REQUESTED) {
+            subscribeOnEvent(Event.RECOMMENDED_THINGS_REQUESTED) {
 
                 // загружаем рекомендуемые вещи
                 updateState(State.LOADING_RECOMMENDED_THINGS)
 
                 // рекомендуемые вещи загружены
-                awaitEvent(Event.RECOMMENDED_THINGS_LOADED) {
+                subscribeOnEvent(Event.RECOMMENDED_THINGS_LOADED) {
 
-                    // устанавливаем в качестве основного состояния отображение любимых и понравившихся вещей
-                    updateState(State.DISPLAY_ALL_THINGS, true)
+                    // устанавливаем в качестве основного состояния отображение любимых и рекомендуемых вещей
+                    updateState(State.SHOWING_ALL_THINGS, true)
 
                     // пользователю понравилась рекомендуемая вещь
-                    awaitEvent(Event.RECOMMENDED_THING_LIKED) {
+                    subscribeOnEvent(Event.RECOMMENDED_THING_LIKED) {
 
                         // добавляем понравившуюся вещь в любимые
                         updateState(State.ADDING_THING_TO_FAVOURITES)
 
                         // понравившуюся вещь добавлена в любимые
-                        awaitEvent(Event.FAVOURITE_THING_ADDED) {
+                        subscribeOnEvent(Event.THING_ADDED_TO_FAVOURITES) {
 
                             // возвращаемся в основное состояние
                             updateState(primaryState)
@@ -58,12 +58,31 @@ class ThingsManagingProcess : BusinessProcess<Event, State>() {
             }
 
             // пользователь запросил скрыть рекомендуемые вещи
-            awaitEvent(Event.RECOMMENDED_THINGS_HIDE_REQUESTED) {
+            subscribeOnEvent(Event.RECOMMENDED_THINGS_HIDE_REQUESTED) {
 
                 // устанавливаем в качестве основного состояния отображение только любимых вещей
-                updateState(State.DISPLAY_ONLY_FAVOURITE_THINGS, true)
+                updateState(State.SHOWING_ONLY_FAVOURITE_THINGS, true)
             }
         }
     }
 
+    enum class Event {
+        FAVOURITE_THINGS_LOADED,
+        FAVOURITE_THING_UNLIKED,
+        FAVOURITE_THING_DELETED,
+        RECOMMENDED_THINGS_REQUESTED,
+        RECOMMENDED_THINGS_LOADED,
+        RECOMMENDED_THING_LIKED,
+        THING_ADDED_TO_FAVOURITES,
+        RECOMMENDED_THINGS_HIDE_REQUESTED
+    }
+
+    enum class State {
+        LOADING_FAVOURITE_THINGS,
+        SHOWING_ONLY_FAVOURITE_THINGS,
+        DELETING_FAVOURITE_THING,
+        LOADING_RECOMMENDED_THINGS,
+        SHOWING_ALL_THINGS,
+        ADDING_THING_TO_FAVOURITES
+    }
 }

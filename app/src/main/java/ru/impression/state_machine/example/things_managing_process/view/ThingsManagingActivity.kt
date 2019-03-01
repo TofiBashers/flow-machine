@@ -1,51 +1,54 @@
 package ru.impression.state_machine.example.things_managing_process.view
 
 import android.os.Bundle
-import android.view.View
+import android.support.v7.app.AppCompatActivity
 import kotlinx.android.synthetic.main.activity_things_managing.*
-import ru.impression.state_machine.BusinessProcessActivity
+import ru.impression.state_machine.FlowManager
+import ru.impression.state_machine.FlowPerformer
 import ru.impression.state_machine.R
-import ru.impression.state_machine.example.things_managing_process.Event
-import ru.impression.state_machine.example.things_managing_process.State
+import ru.impression.state_machine.example.things_managing_process.ThingsManagingFlow
 
-class ThingsManagingActivity : BusinessProcessActivity<Event, State>() {
+class ThingsManagingActivity : AppCompatActivity(),
+    FlowPerformer<ThingsManagingFlow, ThingsManagingFlow.Event, ThingsManagingFlow.State> {
+
+    override val flowClass = ThingsManagingFlow::class.java
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        FlowManager.startFlow(ThingsManagingFlow())
+
         recommended_things_loader_button.setOnClickListener {
-            makeEvent(Event.RECOMMENDED_THINGS_REQUESTED)
+            makeEvent(ThingsManagingFlow.Event.RECOMMENDED_THINGS_REQUESTED)
         }
     }
 
-    override fun onStateUpdated(state: State) {
-        when (state) {
-            State.DISPLAY_ONLY_FAVOURITE_THINGS -> {
-                showFavouriteThingsFragment()
-                showRecommendedThingsLoaderButton()
-            }
-            State.DISPLAY_ALL_THINGS -> {
-                showFavouriteThingsFragment()
-                showRecommendedThingsFragment()
-            }
+    override fun onStateUpdated(oldState: ThingsManagingFlow.State, newState: ThingsManagingFlow.State) {
+        when (newState) {
+            ThingsManagingFlow.State.LOADING_FAVOURITE_THINGS -> showThingsLoadingFragment(R.id.top_container)
+            ThingsManagingFlow.State.SHOWING_ONLY_FAVOURITE_THINGS -> showFavouriteThingsFragment()
+            ThingsManagingFlow.State.LOADING_RECOMMENDED_THINGS -> showThingsLoadingFragment(R.id.bottom_container)
+            ThingsManagingFlow.State.SHOWING_ALL_THINGS -> showRecommendedThingsFragment()
             else -> Unit
         }
     }
 
-    private fun showFavouriteThingsFragment() {
+    private fun showThingsLoadingFragment(container: Int) =
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.top_container, RecommendedThingsFragment.newInstance())
+            .add(container, ThingsLoadingFragment.newInstance())
             .commit()
-    }
 
-    private fun showRecommendedThingsLoaderButton() {
-        recommended_things_loader_button.visibility = View.VISIBLE
-    }
+    private fun showFavouriteThingsFragment() =
+        supportFragmentManager
+            .beginTransaction()
+            .add(R.id.top_container, RecommendedThingsFragment.newInstance())
+            .commit()
 
     private fun showRecommendedThingsFragment() =
         supportFragmentManager
             .beginTransaction()
-            .replace(R.id.bottom_container, RecommendedThingsFragment.newInstance())
+            .add(R.id.bottom_container, RecommendedThingsFragment.newInstance())
             .commit()
 
 }

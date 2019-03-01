@@ -1,45 +1,47 @@
 package ru.impression.state_machine.example.things_managing_process.view
 
 import android.os.Bundle
+import android.support.v4.app.Fragment
+import android.support.v7.app.AppCompatActivity
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
 import android.widget.AdapterView
 import android.widget.ListView
-import ru.impression.state_machine.BusinessProcess
-import ru.impression.state_machine.BusinessProcessFragment
+import ru.impression.state_machine.FlowPerformer
 import ru.impression.state_machine.R
-import ru.impression.state_machine.example.things_managing_process.event.FavouriteThingDeleted
-import ru.impression.state_machine.example.things_managing_process.event.FavouriteThingUnliked
-import ru.impression.state_machine.example.things_managing_process.state.DeletingFavouriteThing
+import ru.impression.state_machine.example.things_managing_process.ThingsManagingFlow
+import ru.impression.state_machine.example.things_managing_process.view.model.ThingsManagingModel
 
-private const val KEY_ITEMS = "ITEMS"
+class FavouriteThingsFragment : Fragment(),
+    FlowPerformer<ThingsManagingFlow, ThingsManagingFlow.Event, ThingsManagingFlow.State>() {
+    override val flowClass: Class<ThingsManagingFlow>
+        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
-class FavouriteThingsFragment : BusinessProcessFragment() {
+    override val businessProcessActivity: AppCompatActivity get() = activity
 
+    private lateinit var model: ThingsManagingModel
     private lateinit var favouriteThingsListView: ListView
-
-    override fun onStateUpdated(state: BusinessProcess.State) {
-        when (state) {
-            is DeletingFavouriteThing -> deleteFavouriteThing(state.thing)
-        }
-    }
 
     override fun onCreateView(inflater: LayoutInflater, container: ViewGroup?, savedInstanceState: Bundle?): View =
         View.inflate(context, R.layout.fragment_favourite_things, null).also {
-            favouriteThingsListView = it.findViewById<ListView>(R.id.favourite_things_list_view).apply {
-                val adapter = ThingsAdapter(context!!).apply {
-                    addAll(arguments!!.getStringArrayList(KEY_ITEMS)!!)
-                }
-                this.adapter = adapter
-                onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
-                    makeEvent(FavouriteThingUnliked(adapter.getItem(position)!!))
-                }
-            }
+            favouriteThingsListView = it.findViewById(R.id.favourite_things_list_view)
         }
 
-    private fun deleteFavouriteThing(thing: String) {
-        makeEvent(FavouriteThingDeleted())
+    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
+        super.onViewCreated(view, savedInstanceState)
+        val adapter = ThingsAdapter(context!!).apply {
+            addAll(model.favouriteThings)
+        }
+        favouriteThingsListView.adapter = adapter
+        favouriteThingsListView.onItemClickListener = AdapterView.OnItemClickListener { parent, view, position, id ->
+            adapter.getItem(position)!!
+            makeEvent(ThingsManagingFlow.Event.FAVOURITE_THING_UNLIKED)
+        }
+    }
+
+    override fun onStateUpdated(oldState: ThingsManagingFlow.State, newState: ThingsManagingFlow.State) {
+
     }
 
     companion object {
