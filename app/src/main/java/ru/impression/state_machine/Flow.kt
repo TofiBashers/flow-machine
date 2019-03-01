@@ -22,5 +22,6 @@ abstract class Flow<E : Enum<E>, S : Enum<S>> {
         if (makePrimary) {
             primaryState = state
         }
+        REGISTERED_FLOW_PERFORMERS[javaClass!!]?.forEach { (it as FlowPerformer<E, S>).onNewState(lastState, currentState) }
     }
 }

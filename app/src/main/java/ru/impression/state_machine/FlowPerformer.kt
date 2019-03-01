@@ -1,12 +1,14 @@
 package ru.impression.state_machine
 
-interface FlowPerformer<F : Flow<E, S>, E : Enum<E>, S : Enum<S>> {
+interface FlowPerformer<E : Enum<E>, S : Enum<S>> {
 
-    val flowClass: Class<F>
+    fun <F : Flow<E, S>> attachToFlow(flow: Class<F>) {
+        REGISTERED_FLOW_PERFORMERS[this] = flow as Class<Flow<*, *>>
+    }
 
-    fun onStateUpdated(oldState: S, newState: S)
+    fun onNewState(oldState: S?, newState: S)
 
     fun makeEvent(event: E) {
-        REGISTERED_FLOWS[flowClass.canonicalName!!]
+
     }
 }

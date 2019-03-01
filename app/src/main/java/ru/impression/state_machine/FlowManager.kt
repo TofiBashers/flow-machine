@@ -1,15 +1,14 @@
 package ru.impression.state_machine
 
-import java.util.*
-
 object FlowManager {
 
-    fun startFlow(flow: Flow<*, *>) {
-        REGISTERED_FLOWS[flow.javaClass.canonicalName!!] = flow
-        flow.startInternal()
+    fun <F : Flow<*, *>> startFlow(flow: Class<F>) {
+        val flowInstance = flow.newInstance()
+        REGISTERED_FLOWS[flow.canonicalName!!] = flowInstance
+        flowInstance.startInternal()
     }
 
-    fun finishFlow(flow: Flow<*, *>) {
-        REGISTERED_FLOWS.remove(flow.javaClass.canonicalName!!)
+    fun <F : Flow<*, *>> finishFlow(flow: Class<F>) {
+        REGISTERED_FLOWS.remove(flow.canonicalName!!)
     }
 }

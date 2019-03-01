@@ -1,18 +1,19 @@
-package ru.impression.state_machine.example.things_managing_process.view.model
+package ru.impression.state_machine.example.things_managing.view.model
 
-import android.app.Application
-import ru.impression.state_machine.BusinessProcessViewModel
-import ru.impression.state_machine.example.things_managing_process.ThingsManagingFlow
+import android.arch.lifecycle.ViewModel
+import ru.impression.state_machine.FlowPerformer
+import ru.impression.state_machine.example.things_managing.ThingsManagingFlow
 import kotlin.concurrent.thread
 
-class ThingsManagingModel(application: Application) :
-    BusinessProcessViewModel<ThingsManagingFlow.Event, ThingsManagingFlow.State>(application) {
+/*class ThingsManagingModel : ViewModel(), FlowPerformer<ThingsManagingFlow.Event, ThingsManagingFlow.State> {
+
+    override val flowTag = ThingsManagingFlow.TAG
 
     lateinit var favouriteThings: ArrayList<String>
 
     lateinit var favouriteThingToDelete: String
 
-    override fun onStateUpdated(oldState: ThingsManagingFlow.State, newState: ThingsManagingFlow.State) {
+    override fun onNewStateReceive(oldState: ThingsManagingFlow.State, newState: ThingsManagingFlow.State) {
         when (newState) {
             ThingsManagingFlow.State.LOADING_FAVOURITE_THINGS -> loadFavouriteThings()
             ThingsManagingFlow.State.DELETING_FAVOURITE_THING -> deleteFavouriteThing()
@@ -32,4 +33,4 @@ class ThingsManagingModel(application: Application) :
         makeEvent(ThingsManagingFlow.Event.FAVOURITE_THING_DELETED)
     }
 
-}
+}*/

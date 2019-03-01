@@ -9,7 +9,7 @@
             android:roundIcon="@mipmap/ic_launcher_round"
             android:supportsRtl="true"
             android:theme="@style/AppTheme">
-        <activity android:name="ru.impression.state_machine.example.things_managing_process.view.ThingsManagingActivity">
+        <activity android:name="ru.impression.state_machine.example.things_managing.view.ThingsManagingActivity">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN"/>
 

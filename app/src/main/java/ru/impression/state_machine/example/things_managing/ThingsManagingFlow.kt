@@ -1,4 +1,4 @@
-package ru.impression.state_machine.example.things_managing_process
+package ru.impression.state_machine.example.things_managing
 
 import ru.impression.state_machine.Flow
 
