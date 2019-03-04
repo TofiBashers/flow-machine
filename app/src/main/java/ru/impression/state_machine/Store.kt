@@ -3,9 +3,12 @@ package ru.impression.state_machine
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 import java.util.HashMap
+import java.util.concurrent.ConcurrentHashMap
 
-internal val DISPOSABLES: HashMap<String, CompositeDisposable> = HashMap()
+internal val DISPOSABLES: ConcurrentHashMap<String, CompositeDisposable> = ConcurrentHashMap()
 
-internal val EVENT_SUBJECTS: HashMap<String, HashMap<Enum<*>, BehaviorSubject<Unit>>> = HashMap()
+internal val FLOW_PERFORMER_ATTACH_SUBJECTS: ConcurrentHashMap<String, BehaviorSubject<Int>> = ConcurrentHashMap()
 
-internal val STATE_SUBJECTS: HashMap<String, ArrayList<BehaviorSubject<NewStateReceiving>>> = HashMap()
+internal val EVENT_SUBJECTS: ConcurrentHashMap<String, HashMap<Enum<*>, BehaviorSubject<Unit>>> = ConcurrentHashMap()
+
+internal val STATE_SUBJECTS: ConcurrentHashMap<String, ArrayList<BehaviorSubject<NewStateReceiving>>> = ConcurrentHashMap()

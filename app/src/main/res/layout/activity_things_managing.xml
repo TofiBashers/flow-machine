@@ -4,27 +4,25 @@
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        tools:context=".BusinessProcessActivity"
+        tools:context=".example.things_managing.view.ThingsManagingActivity"
         android:orientation="vertical">
 
-    <View
+    <FrameLayout
             android:id="@+id/top_container"
             android:layout_width="match_parent"
             android:layout_height="0dp"
             android:layout_weight="1"/>
 
-    <RelativeLayout
+
+    <Button
+            android:id="@+id/recommended_things_loader_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"/>
+
+    <FrameLayout
             android:id="@+id/bottom_container"
             android:layout_width="match_parent"
             android:layout_height="0dp"
-            android:layout_weight="1">
-
-        <Button
-                android:id="@+id/recommended_things_loader_button"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_centerInParent="true"/>
-
-    </RelativeLayout>
+            android:layout_weight="1"/>
 
 </LinearLayout>

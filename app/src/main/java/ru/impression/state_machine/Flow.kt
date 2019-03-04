@@ -8,7 +8,17 @@ abstract class Flow<E : Enum<E>, S : Enum<S>> {
 
     protected abstract fun start()
 
-    internal fun startInternal() = start()
+    internal fun startInternal() {
+        DISPOSABLES[javaClass.canonicalName!!]!!.addAll(
+            FLOW_PERFORMER_ATTACH_SUBJECTS[javaClass.canonicalName!!]!!
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(Schedulers.newThread())
+                .subscribe {
+                    makeNewStateReceiving(STATE_SUBJECTS[javaClass.canonicalName!!]!![it])
+                }
+        )
+        start()
+    }
 
     protected var currentState: S? = null
 
@@ -32,6 +42,10 @@ abstract class Flow<E : Enum<E>, S : Enum<S>> {
         if (makePrimary) {
             primaryState = state
         }
-        STATE_SUBJECTS[javaClass.canonicalName!!]!!.forEach { it.onNext(NewStateReceiving(lastState, currentState!!)) }
+        STATE_SUBJECTS[javaClass.canonicalName!!]!!.forEach { makeNewStateReceiving(it) }
     }
+
+    private fun makeNewStateReceiving(stateSubject: BehaviorSubject<NewStateReceiving>) = stateSubject.onNext(
+        NewStateReceiving(lastState, currentState!!)
+    )
 }

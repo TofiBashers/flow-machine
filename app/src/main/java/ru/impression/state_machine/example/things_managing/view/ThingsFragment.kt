@@ -14,22 +14,17 @@ abstract class ThingsFragment : ListFragment(),
 
     override val flow = ThingsManagingFlow::class.java
 
-    protected lateinit var model: ThingsManagingModel
-
     abstract val thingsListAdapterData: List<String>
+
+    protected lateinit var model: ThingsManagingModel
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         model = ViewModelProviders.of(activity!!).get(ThingsManagingModel::class.java)
+        listAdapter = ArrayAdapter<String>(context!!, android.R.layout.simple_list_item_1, thingsListAdapterData)
 
         attachToFlow()
     }
 
-    protected fun updateAdapter() {
-        listAdapter = ArrayAdapter<String>(context!!, android.R.layout.simple_list_item_1, thingsListAdapterData)
-    }
-
-    protected fun removeAdapted() {
-        listAdapter = null
-    }
+    override fun onNewStateReceived(oldState: ThingsManagingFlow.State?, newState: ThingsManagingFlow.State) = Unit
 }

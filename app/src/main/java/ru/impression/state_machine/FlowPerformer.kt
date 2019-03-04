@@ -18,6 +18,9 @@ interface FlowPerformer<F : Flow<E, S>, E : Enum<E>, S : Enum<S>> {
                 onNewStateReceived(it.oldState as S?, it.newState as S)
             }
         )
+        FLOW_PERFORMER_ATTACH_SUBJECTS[flow.canonicalName!!]!!.onNext(
+            STATE_SUBJECTS[flow.canonicalName!!]!!.indexOf(stateSubject)
+        )
     }
 
     fun onNewStateReceived(oldState: S?, newState: S)

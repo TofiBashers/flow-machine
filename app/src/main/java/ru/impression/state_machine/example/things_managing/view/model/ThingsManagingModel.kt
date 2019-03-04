@@ -1,6 +1,7 @@
 package ru.impression.state_machine.example.things_managing.view.model
 
 import android.arch.lifecycle.ViewModel
+import android.util.Log
 import ru.impression.state_machine.FlowPerformer
 import ru.impression.state_machine.example.things_managing.ThingsManagingFlow
 import kotlin.concurrent.thread
@@ -9,6 +10,10 @@ class ThingsManagingModel : ViewModel(),
     FlowPerformer<ThingsManagingFlow, ThingsManagingFlow.Event, ThingsManagingFlow.State> {
 
     override val flow = ThingsManagingFlow::class.java
+
+    init {
+        attachToFlow()
+    }
 
     override fun onNewStateReceived(oldState: ThingsManagingFlow.State?, newState: ThingsManagingFlow.State) {
         when (newState) {
@@ -24,9 +29,9 @@ class ThingsManagingModel : ViewModel(),
 
     lateinit var recommendedThings: ArrayList<String>
 
-    lateinit var favouriteThingToDelete: String
+    lateinit var unlikedFavouriteThing: String
 
-    lateinit var thingToMakeFavourite: String
+    lateinit var likedRecommendedThing: String
 
     private fun loadFavouriteThings() = thread {
         Thread.sleep(1000)
@@ -36,7 +41,7 @@ class ThingsManagingModel : ViewModel(),
 
     private fun deleteFavouriteThing() = thread {
         Thread.sleep(1000)
-        favouriteThings.remove(favouriteThingToDelete)
+        favouriteThings.remove(unlikedFavouriteThing)
         makeEvent(ThingsManagingFlow.Event.FAVOURITE_THING_DELETED)
     }
 
@@ -48,7 +53,8 @@ class ThingsManagingModel : ViewModel(),
 
     private fun makeThingFavourite() = thread {
         Thread.sleep(1000)
-        favouriteThings.add(thingToMakeFavourite)
+        favouriteThings.add(likedRecommendedThing)
+        recommendedThings.remove(likedRecommendedThing)
         makeEvent(ThingsManagingFlow.Event.THING_BECAME_FAVOURITE)
     }
 
