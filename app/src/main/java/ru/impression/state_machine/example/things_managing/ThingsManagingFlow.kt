@@ -24,29 +24,7 @@ class ThingsManagingFlow : Flow<ThingsManagingFlow.Event, ThingsManagingFlow.Sta
                 // любимая вещь удалена
                 subscribeOnEvent(Event.FAVOURITE_THING_REMOVED) {
 
-                    if (primaryState == State.SHOWING_FAVOURITE_THINGS) {
-
-                        // обновляем любимые вещи
-                        updateState(State.REFRESHING_FAVOURITE_THINGS)
-
-                        // любимые вещи обновлены
-                        subscribeOnEvent(Event.FAVOURITE_THINGS_REFRESHED) {
-
-                            // возвращаемся в основное состояние
-                            updateState(primaryState!!)
-                        }
-                    } else {
-
-                        // обновляем все вещи
-                        updateState(State.REFRESHING_ALL_THINGS)
-
-                        // все вещи обновлены
-                        subscribeOnEvent(Event.ALL_THINGS_REFRESHED) {
-
-                            // возвращаемся в основное состояние
-                            updateState(primaryState!!)
-                        }
-                    }
+                    refreshThings()
                 }
             }
 
@@ -71,29 +49,7 @@ class ThingsManagingFlow : Flow<ThingsManagingFlow.Event, ThingsManagingFlow.Sta
                         // понравившаяся вещь добавлена в любимые
                         subscribeOnEvent(Event.FAVOURITE_THING_ADDED) {
 
-                            if (primaryState == State.SHOWING_FAVOURITE_THINGS) {
-
-                                // обновляем любимые вещи
-                                updateState(State.REFRESHING_FAVOURITE_THINGS)
-
-                                // любимые вещи обновлены
-                                subscribeOnEvent(Event.FAVOURITE_THINGS_REFRESHED) {
-
-                                    // возвращаемся в основное состояние
-                                    updateState(primaryState!!)
-                                }
-                            } else {
-
-                                // обновляем все вещи
-                                updateState(State.REFRESHING_ALL_THINGS)
-
-                                // все вещи обновлены
-                                subscribeOnEvent(Event.ALL_THINGS_REFRESHED) {
-
-                                    // возвращаемся в основное состояние
-                                    updateState(primaryState!!)
-                                }
-                            }
+                            refreshThings()
                         }
                     }
                 }
@@ -107,6 +63,33 @@ class ThingsManagingFlow : Flow<ThingsManagingFlow.Event, ThingsManagingFlow.Sta
             }
         }
     }
+
+    private fun refreshThings() =
+
+        if (primaryState == State.SHOWING_FAVOURITE_THINGS) {
+
+            // обновляем любимые вещи
+            updateState(State.REFRESHING_FAVOURITE_THINGS)
+
+            // любимые вещи обновлены
+            subscribeOnEvent(Event.FAVOURITE_THINGS_REFRESHED) {
+
+                // возвращаемся в основное состояние
+                updateState(primaryState!!)
+            }
+
+        } else {
+
+            // обновляем все вещи
+            updateState(State.REFRESHING_ALL_THINGS)
+
+            // все вещи обновлены
+            subscribeOnEvent(Event.ALL_THINGS_REFRESHED) {
+
+                // возвращаемся в основное состояние
+                updateState(primaryState!!)
+            }
+        }
 
     enum class Event {
         FAVOURITE_THINGS_LOADED,
