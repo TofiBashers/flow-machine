@@ -4,11 +4,14 @@ object FlowManager {
 
     fun <F : Flow<*, *>> startFlow(flow: Class<F>) {
         val flowInstance = flow.newInstance()
-        REGISTERED_FLOWS[flow.canonicalName!!] = flowInstance
+        EVENT_SUBJECTS[flow.canonicalName!!] = HashMap()
         flowInstance.startInternal()
     }
 
     fun <F : Flow<*, *>> finishFlow(flow: Class<F>) {
-        REGISTERED_FLOWS.remove(flow.canonicalName!!)
+        DISPOSABLES[flow.canonicalName!!]!!.dispose()
+        DISPOSABLES.remove(flow.canonicalName!!)
+        EVENT_SUBJECTS.remove(flow.canonicalName!!)
+        STATE_SUBJECTS.remove(flow.canonicalName!!)
     }
 }

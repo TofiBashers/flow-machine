@@ -5,15 +5,17 @@ import ru.impression.state_machine.FlowPerformer
 import ru.impression.state_machine.example.things_managing.ThingsManagingFlow
 import kotlin.concurrent.thread
 
-/*class ThingsManagingModel : ViewModel(), FlowPerformer<ThingsManagingFlow.Event, ThingsManagingFlow.State> {
-
-    override val flowTag = ThingsManagingFlow.TAG
+class ThingsManagingModel : ViewModel(), FlowPerformer<ThingsManagingFlow.Event, ThingsManagingFlow.State> {
 
     lateinit var favouriteThings: ArrayList<String>
 
+    lateinit var recommendedThings: ArrayList<String>
+
     lateinit var favouriteThingToDelete: String
 
-    override fun onNewStateReceive(oldState: ThingsManagingFlow.State, newState: ThingsManagingFlow.State) {
+    lateinit var thingToMakeFavourite: String
+
+    override fun onNewState(oldState: ThingsManagingFlow.State?, newState: ThingsManagingFlow.State) {
         when (newState) {
             ThingsManagingFlow.State.LOADING_FAVOURITE_THINGS -> loadFavouriteThings()
             ThingsManagingFlow.State.DELETING_FAVOURITE_THING -> deleteFavouriteThing()
@@ -33,4 +35,4 @@ import kotlin.concurrent.thread
         makeEvent(ThingsManagingFlow.Event.FAVOURITE_THING_DELETED)
     }
 
-}*/
+}

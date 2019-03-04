@@ -25,7 +25,7 @@ class ThingsManagingFlow : Flow<ThingsManagingFlow.Event, ThingsManagingFlow.Sta
                 subscribeOnEvent(Event.FAVOURITE_THING_DELETED) {
 
                     // возвращаемся в основное состояние
-                    updateState(primaryState)
+                    updateState(primaryState!!)
                 }
             }
 
@@ -39,7 +39,7 @@ class ThingsManagingFlow : Flow<ThingsManagingFlow.Event, ThingsManagingFlow.Sta
                 subscribeOnEvent(Event.RECOMMENDED_THINGS_LOADED) {
 
                     // устанавливаем в качестве основного состояния отображение любимых и рекомендуемых вещей
-                    updateState(State.SHOWING_ALL_THINGS, true)
+                    updateState(State.SHOWING_FAVOURITE_AND_RECOMMENDED_THINGS, true)
 
                     // пользователю понравилась рекомендуемая вещь
                     subscribeOnEvent(Event.RECOMMENDED_THING_LIKED) {
@@ -51,7 +51,7 @@ class ThingsManagingFlow : Flow<ThingsManagingFlow.Event, ThingsManagingFlow.Sta
                         subscribeOnEvent(Event.THING_ADDED_TO_FAVOURITES) {
 
                             // возвращаемся в основное состояние
-                            updateState(primaryState)
+                            updateState(primaryState!!)
                         }
                     }
                 }
@@ -82,7 +82,7 @@ class ThingsManagingFlow : Flow<ThingsManagingFlow.Event, ThingsManagingFlow.Sta
         SHOWING_ONLY_FAVOURITE_THINGS,
         DELETING_FAVOURITE_THING,
         LOADING_RECOMMENDED_THINGS,
-        SHOWING_ALL_THINGS,
+        SHOWING_FAVOURITE_AND_RECOMMENDED_THINGS,
         ADDING_THING_TO_FAVOURITES
     }
 }

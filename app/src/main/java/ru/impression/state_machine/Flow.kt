@@ -1,5 +1,8 @@
 package ru.impression.state_machine
 
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.BehaviorSubject
+
 
 abstract class Flow<E : Enum<E>, S : Enum<S>> {
 
@@ -7,21 +10,28 @@ abstract class Flow<E : Enum<E>, S : Enum<S>> {
 
     internal fun startInternal() = start()
 
-    protected lateinit var currentState: S
+    protected var currentState: S? = null
 
-    protected lateinit var lastState: S
+    protected var lastState: S? = null
 
-    protected lateinit var primaryState: S
+    protected var primaryState: S? = null
 
-    fun subscribeOnEvent(event: E, onEvent: () -> Unit) {
+    protected fun subscribeOnEvent(event: E, onEvent: () -> Unit) {
+        val eventSubject = BehaviorSubject.create<Unit>()
+        EVENT_SUBJECTS[javaClass.canonicalName!!]!![event] = eventSubject
+        DISPOSABLES[javaClass.canonicalName!!]!!.addAll(eventSubject
+            .subscribeOn(Schedulers.newThread())
+            .observeOn(Schedulers.newThread())
+            .subscribe { onEvent.invoke() }
+        )
     }
 
-    fun updateState(state: S, makePrimary: Boolean = false) {
+    protected fun updateState(state: S, makePrimary: Boolean = false) {
         lastState = currentState
         currentState = state
         if (makePrimary) {
             primaryState = state
         }
-        REGISTERED_FLOW_PERFORMERS[javaClass!!]?.forEach { (it as FlowPerformer<E, S>).onNewState(lastState, currentState) }
+        STATE_SUBJECTS[javaClass.canonicalName!!]!!.forEach { it.onNext(NewStateReceiving(lastState, currentState!!)) }
     }
 }

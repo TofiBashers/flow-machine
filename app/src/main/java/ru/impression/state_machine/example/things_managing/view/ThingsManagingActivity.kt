@@ -10,7 +10,10 @@ import ru.impression.state_machine.R
 import ru.impression.state_machine.example.things_managing.ThingsManagingFlow
 
 class ThingsManagingActivity : AppCompatActivity(),
-    FlowPerformer<ThingsManagingFlow.Event, ThingsManagingFlow.State> {
+    FlowPerformer<ThingsManagingFlow, ThingsManagingFlow.Event, ThingsManagingFlow.State> {
+
+    override val flow: Class<ThingsManagingFlow>
+        get() = ThingsManagingFlow::class.java
 
     init {
         FlowManager.startFlow(ThingsManagingFlow::class.java)
@@ -19,23 +22,23 @@ class ThingsManagingActivity : AppCompatActivity(),
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        attachToFlow(ThingsManagingFlow::class.java)
+        attachToFlow()
 
         recommended_things_loader_button.setOnClickListener {
             makeEvent(ThingsManagingFlow.Event.RECOMMENDED_THINGS_REQUESTED)
         }
     }
 
-    override fun onNewState(oldState: ThingsManagingFlow.State?, newState: ThingsManagingFlow.State) {
+    override fun onNewStateReceived(oldState: ThingsManagingFlow.State?, newState: ThingsManagingFlow.State) {
         when (newState) {
             ThingsManagingFlow.State.LOADING_FAVOURITE_THINGS -> showFragment(
                 R.id.top_container,
                 FavouriteThingsFragment.newInstance()
             )
-           /* ThingsManagingFlow.State.LOADING_RECOMMENDED_THINGS -> showFragment(
+            ThingsManagingFlow.State.LOADING_RECOMMENDED_THINGS -> showFragment(
                 R.id.bottom_container,
                 RecommendedThingsFragment.newInstance()
-            )*/
+            )
             else -> Unit
         }
     }

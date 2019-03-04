@@ -1,14 +1,28 @@
 package ru.impression.state_machine
 
-interface FlowPerformer<E : Enum<E>, S : Enum<S>> {
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
+import io.reactivex.subjects.BehaviorSubject
 
-    fun <F : Flow<E, S>> attachToFlow(flow: Class<F>) {
-        REGISTERED_FLOW_PERFORMERS[this] = flow as Class<Flow<*, *>>
+interface FlowPerformer<F : Flow<E, S>, E : Enum<E>, S : Enum<S>> {
+
+    val flow: Class<F>
+
+    fun attachToFlow() {
+        val stateSubject = BehaviorSubject.create<NewStateReceiving>()
+        STATE_SUBJECTS[flow.canonicalName!!]!!.add(stateSubject)
+        DISPOSABLES[flow.canonicalName!!]!!.addAll(stateSubject
+            .subscribeOn(Schedulers.newThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe {
+                onNewStateReceived(it.oldState as S?, it.newState as S)
+            }
+        )
     }
 
-    fun onNewState(oldState: S?, newState: S)
+    fun onNewStateReceived(oldState: S?, newState: S)
 
     fun makeEvent(event: E) {
-
+        EVENT_SUBJECTS[flow.canonicalName!!]!![event]!!.onNext(Unit)
     }
 }

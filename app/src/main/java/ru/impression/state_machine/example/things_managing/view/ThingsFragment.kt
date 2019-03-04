@@ -21,7 +21,9 @@ abstract class ThingsFragment : ListFragment(),
         model = ViewModelProviders.of(activity!!).get(ThingsManagingModel::class.java)
 
         attachToFlow(ThingsManagingFlow::class.java)
+    }
 
+    protected fun updateAdapter() {
         listAdapter = ArrayAdapter<String>(context!!, android.R.layout.simple_list_item_1, thingsListAdapterData)
     }
 }
