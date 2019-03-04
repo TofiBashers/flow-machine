@@ -75,12 +75,6 @@ class ThingsManagingActivity : AppCompatActivity(),
             .commit()
     }
 
-    private fun <F : Fragment> removeFragment(fragmentClass: Class<F>) =
-        supportFragmentManager
-            .beginTransaction()
-            .remove(supportFragmentManager.findFragmentByTag(fragmentClass.canonicalName)!!)
-            .commit()
-
     override fun finish() {
         FlowManager.finishFlow(flow)
         super.finish()
