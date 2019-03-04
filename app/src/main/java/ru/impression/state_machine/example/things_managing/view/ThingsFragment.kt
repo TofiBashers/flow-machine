@@ -10,7 +10,9 @@ import ru.impression.state_machine.example.things_managing.ThingsManagingFlow
 import ru.impression.state_machine.example.things_managing.view.model.ThingsManagingModel
 
 abstract class ThingsFragment : ListFragment(),
-    FlowPerformer<ThingsManagingFlow.Event, ThingsManagingFlow.State> {
+    FlowPerformer<ThingsManagingFlow, ThingsManagingFlow.Event, ThingsManagingFlow.State> {
+
+    override val flow = ThingsManagingFlow::class.java
 
     protected lateinit var model: ThingsManagingModel
 
@@ -20,10 +22,14 @@ abstract class ThingsFragment : ListFragment(),
         super.onViewCreated(view, savedInstanceState)
         model = ViewModelProviders.of(activity!!).get(ThingsManagingModel::class.java)
 
-        attachToFlow(ThingsManagingFlow::class.java)
+        attachToFlow()
     }
 
     protected fun updateAdapter() {
         listAdapter = ArrayAdapter<String>(context!!, android.R.layout.simple_list_item_1, thingsListAdapterData)
+    }
+
+    protected fun removeAdapted() {
+        listAdapter = null
     }
 }

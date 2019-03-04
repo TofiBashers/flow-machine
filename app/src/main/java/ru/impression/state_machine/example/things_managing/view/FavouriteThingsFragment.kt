@@ -1,12 +1,28 @@
 package ru.impression.state_machine.example.things_managing.view
 
+import android.view.View
+import android.widget.ListView
 import ru.impression.state_machine.example.things_managing.ThingsManagingFlow
 
 class FavouriteThingsFragment : ThingsFragment() {
-    override val thingsListAdapterData: List<String>
-        get() = TODO("not implemented") //To change initializer of created properties use File | Settings | File Templates.
 
-    override fun onNewState(oldState: ThingsManagingFlow.State?, newState: ThingsManagingFlow.State) {
+    override fun onNewStateReceived(oldState: ThingsManagingFlow.State?, newState: ThingsManagingFlow.State) {
+        if (newState == ThingsManagingFlow.State.LOADING_FAVOURITE_THINGS ||
+            newState == ThingsManagingFlow.State.DELETING_FAVOURITE_THING ||
+            newState == ThingsManagingFlow.State.MAKING_THING_FAVOURITE
+        ) removeAdapted()
+        else if (oldState == ThingsManagingFlow.State.LOADING_FAVOURITE_THINGS ||
+            oldState == ThingsManagingFlow.State.DELETING_FAVOURITE_THING ||
+            oldState == ThingsManagingFlow.State.MAKING_THING_FAVOURITE
+        ) updateAdapter()
+    }
+
+    override val thingsListAdapterData: List<String>
+        get() = model.favouriteThings
+
+    override fun onListItemClick(l: ListView?, v: View?, position: Int, id: Long) {
+        model.favouriteThingToDelete = thingsListAdapterData[position]
+        makeEvent(ThingsManagingFlow.Event.FAVOURITE_THING_UNLIKED)
     }
 
     companion object {

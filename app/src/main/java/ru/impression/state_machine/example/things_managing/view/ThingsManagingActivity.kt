@@ -12,11 +12,10 @@ import ru.impression.state_machine.example.things_managing.ThingsManagingFlow
 class ThingsManagingActivity : AppCompatActivity(),
     FlowPerformer<ThingsManagingFlow, ThingsManagingFlow.Event, ThingsManagingFlow.State> {
 
-    override val flow: Class<ThingsManagingFlow>
-        get() = ThingsManagingFlow::class.java
+    override val flow = ThingsManagingFlow::class.java
 
     init {
-        FlowManager.startFlow(ThingsManagingFlow::class.java)
+        FlowManager.startFlow(flow)
     }
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -39,6 +38,11 @@ class ThingsManagingActivity : AppCompatActivity(),
                 R.id.bottom_container,
                 RecommendedThingsFragment.newInstance()
             )
+            ThingsManagingFlow.State.SHOWING_ONLY_FAVOURITE_THINGS -> {
+                if (oldState == ThingsManagingFlow.State.SHOWING_FAVOURITE_AND_RECOMMENDED_THINGS) {
+                    removeFragment(RecommendedThingsFragment::class.java)
+                }
+            }
             else -> Unit
         }
     }
@@ -46,11 +50,17 @@ class ThingsManagingActivity : AppCompatActivity(),
     private fun showFragment(container: Int, fragment: Fragment) =
         supportFragmentManager
             .beginTransaction()
-            .add(container, fragment)
+            .add(container, fragment, fragment.javaClass.canonicalName)
+            .commit()
+
+    private fun <F : Fragment> removeFragment(fragmentClass: Class<F>) =
+        supportFragmentManager
+            .beginTransaction()
+            .remove(supportFragmentManager.findFragmentByTag(fragmentClass.canonicalName)!!)
             .commit()
 
     override fun finish() {
-        FlowManager.finishFlow(ThingsManagingFlow::class.java)
+        FlowManager.finishFlow(flow)
         super.finish()
     }
 }

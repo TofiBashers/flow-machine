@@ -45,10 +45,10 @@ class ThingsManagingFlow : Flow<ThingsManagingFlow.Event, ThingsManagingFlow.Sta
                     subscribeOnEvent(Event.RECOMMENDED_THING_LIKED) {
 
                         // добавляем понравившуюся вещь в любимые
-                        updateState(State.ADDING_THING_TO_FAVOURITES)
+                        updateState(State.MAKING_THING_FAVOURITE)
 
                         // понравившуюся вещь добавлена в любимые
-                        subscribeOnEvent(Event.THING_ADDED_TO_FAVOURITES) {
+                        subscribeOnEvent(Event.THING_BECAME_FAVOURITE) {
 
                             // возвращаемся в основное состояние
                             updateState(primaryState!!)
@@ -73,7 +73,7 @@ class ThingsManagingFlow : Flow<ThingsManagingFlow.Event, ThingsManagingFlow.Sta
         RECOMMENDED_THINGS_REQUESTED,
         RECOMMENDED_THINGS_LOADED,
         RECOMMENDED_THING_LIKED,
-        THING_ADDED_TO_FAVOURITES,
+        THING_BECAME_FAVOURITE,
         RECOMMENDED_THINGS_HIDE_REQUESTED
     }
 
@@ -83,6 +83,6 @@ class ThingsManagingFlow : Flow<ThingsManagingFlow.Event, ThingsManagingFlow.Sta
         DELETING_FAVOURITE_THING,
         LOADING_RECOMMENDED_THINGS,
         SHOWING_FAVOURITE_AND_RECOMMENDED_THINGS,
-        ADDING_THING_TO_FAVOURITES
+        MAKING_THING_FAVOURITE
     }
 }
