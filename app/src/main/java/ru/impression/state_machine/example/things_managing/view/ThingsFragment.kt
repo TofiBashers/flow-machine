@@ -21,10 +21,12 @@ abstract class ThingsFragment : ListFragment(),
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         model = ViewModelProviders.of(activity!!).get(ThingsManagingModel::class.java)
-        listAdapter = ArrayAdapter<String>(context!!, android.R.layout.simple_list_item_1, thingsListAdapterData)
+        updateAdapter()
 
         attachToFlow()
     }
 
-    override fun onNewStateReceived(oldState: ThingsManagingFlow.State?, newState: ThingsManagingFlow.State) = Unit
+    protected fun updateAdapter() {
+        listAdapter = ArrayAdapter<String>(context!!, android.R.layout.simple_list_item_1, thingsListAdapterData)
+    }
 }

@@ -5,6 +5,7 @@ import android.widget.ListView
 import ru.impression.state_machine.example.things_managing.ThingsManagingFlow
 
 class RecommendedThingsFragment : ThingsFragment() {
+    override fun onNewStateReceived(oldState: ThingsManagingFlow.State?, newState: ThingsManagingFlow.State) = Unit
 
     override val thingsListAdapterData: List<String>
         get() = model.recommendedThings

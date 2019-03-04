@@ -13,19 +13,40 @@ class ThingsManagingFlow : Flow<ThingsManagingFlow.Event, ThingsManagingFlow.Sta
         subscribeOnEvent(Event.FAVOURITE_THINGS_LOADED) {
 
             // устанавливаем в качестве основного состояния отображение только любимых вещей
-            updateState(State.SHOWING_ONLY_FAVOURITE_THINGS, true)
+            updateState(State.SHOWING_FAVOURITE_THINGS, true)
 
             // пользователь запросил удалить любимую вещь
             subscribeOnEvent(Event.FAVOURITE_THING_UNLIKED) {
 
                 // удаляем любимую вещь
-                updateState(State.DELETING_FAVOURITE_THING)
+                updateState(State.REMOVING_FAVOURITE_THING)
 
                 // любимая вещь удалена
-                subscribeOnEvent(Event.FAVOURITE_THING_DELETED) {
+                subscribeOnEvent(Event.FAVOURITE_THING_REMOVED) {
 
-                    // возвращаемся в основное состояние
-                    updateState(primaryState!!)
+                    if (primaryState == State.SHOWING_FAVOURITE_THINGS) {
+
+                        // обновляем любимые вещи
+                        updateState(State.REFRESHING_FAVOURITE_THINGS)
+
+                        // любимые вещи обновлены
+                        subscribeOnEvent(Event.FAVOURITE_THINGS_REFRESHED) {
+
+                            // возвращаемся в основное состояние
+                            updateState(primaryState!!)
+                        }
+                    } else {
+
+                        // обновляем все вещи
+                        updateState(State.REFRESHING_ALL_THINGS)
+
+                        // все вещи обновлены
+                        subscribeOnEvent(Event.ALL_THINGS_REFRESHED) {
+
+                            // возвращаемся в основное состояние
+                            updateState(primaryState!!)
+                        }
+                    }
                 }
             }
 
@@ -39,19 +60,40 @@ class ThingsManagingFlow : Flow<ThingsManagingFlow.Event, ThingsManagingFlow.Sta
                 subscribeOnEvent(Event.RECOMMENDED_THINGS_LOADED) {
 
                     // устанавливаем в качестве основного состояния отображение любимых и рекомендуемых вещей
-                    updateState(State.SHOWING_FAVOURITE_AND_RECOMMENDED_THINGS, true)
+                    updateState(State.SHOWING_ALL_THINGS, true)
 
                     // пользователю понравилась рекомендуемая вещь
                     subscribeOnEvent(Event.RECOMMENDED_THING_LIKED) {
 
                         // добавляем понравившуюся вещь в любимые
-                        updateState(State.MAKING_THING_FAVOURITE)
+                        updateState(State.ADDING_FAVOURITE_THING)
 
-                        // понравившуюся вещь добавлена в любимые
-                        subscribeOnEvent(Event.THING_BECAME_FAVOURITE) {
+                        // понравившаяся вещь добавлена в любимые
+                        subscribeOnEvent(Event.FAVOURITE_THING_ADDED) {
 
-                            // возвращаемся в основное состояние
-                            updateState(primaryState!!)
+                            if (primaryState == State.SHOWING_FAVOURITE_THINGS) {
+
+                                // обновляем любимые вещи
+                                updateState(State.REFRESHING_FAVOURITE_THINGS)
+
+                                // любимые вещи обновлены
+                                subscribeOnEvent(Event.FAVOURITE_THINGS_REFRESHED) {
+
+                                    // возвращаемся в основное состояние
+                                    updateState(primaryState!!)
+                                }
+                            } else {
+
+                                // обновляем все вещи
+                                updateState(State.REFRESHING_ALL_THINGS)
+
+                                // все вещи обновлены
+                                subscribeOnEvent(Event.ALL_THINGS_REFRESHED) {
+
+                                    // возвращаемся в основное состояние
+                                    updateState(primaryState!!)
+                                }
+                            }
                         }
                     }
                 }
@@ -61,7 +103,7 @@ class ThingsManagingFlow : Flow<ThingsManagingFlow.Event, ThingsManagingFlow.Sta
             subscribeOnEvent(Event.RECOMMENDED_THINGS_HIDE_REQUESTED) {
 
                 // устанавливаем в качестве основного состояния отображение только любимых вещей
-                updateState(State.SHOWING_ONLY_FAVOURITE_THINGS, true)
+                updateState(State.SHOWING_FAVOURITE_THINGS, true)
             }
         }
     }
@@ -69,20 +111,24 @@ class ThingsManagingFlow : Flow<ThingsManagingFlow.Event, ThingsManagingFlow.Sta
     enum class Event {
         FAVOURITE_THINGS_LOADED,
         FAVOURITE_THING_UNLIKED,
-        FAVOURITE_THING_DELETED,
+        FAVOURITE_THING_ADDED,
+        FAVOURITE_THING_REMOVED,
+        FAVOURITE_THINGS_REFRESHED,
         RECOMMENDED_THINGS_REQUESTED,
         RECOMMENDED_THINGS_LOADED,
         RECOMMENDED_THING_LIKED,
-        THING_BECAME_FAVOURITE,
-        RECOMMENDED_THINGS_HIDE_REQUESTED
+        RECOMMENDED_THINGS_HIDE_REQUESTED,
+        ALL_THINGS_REFRESHED
     }
 
     enum class State {
         LOADING_FAVOURITE_THINGS,
-        SHOWING_ONLY_FAVOURITE_THINGS,
-        DELETING_FAVOURITE_THING,
+        SHOWING_FAVOURITE_THINGS,
+        ADDING_FAVOURITE_THING,
+        REMOVING_FAVOURITE_THING,
+        REFRESHING_FAVOURITE_THINGS,
         LOADING_RECOMMENDED_THINGS,
-        SHOWING_FAVOURITE_AND_RECOMMENDED_THINGS,
-        MAKING_THING_FAVOURITE
+        SHOWING_ALL_THINGS,
+        REFRESHING_ALL_THINGS,
     }
 }

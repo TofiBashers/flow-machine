@@ -17,7 +17,7 @@ class ThingsManagingActivity : AppCompatActivity(),
 
     override val flow = ThingsManagingFlow::class.java
 
-    lateinit var model: ThingsManagingModel
+    private lateinit var model: ThingsManagingModel
 
     init {
         FlowManager.startFlow(flow)
@@ -29,41 +29,48 @@ class ThingsManagingActivity : AppCompatActivity(),
         model = ViewModelProviders
             .of(this, ViewModelProvider.NewInstanceFactory())
             .get(ThingsManagingModel::class.java)
-        recommended_things_loader_button.setOnClickListener {
-            makeEvent(ThingsManagingFlow.Event.RECOMMENDED_THINGS_REQUESTED)
-        }
 
         attachToFlow()
     }
 
     override fun onNewStateReceived(oldState: ThingsManagingFlow.State?, newState: ThingsManagingFlow.State) {
         when (newState) {
-            ThingsManagingFlow.State.LOADING_FAVOURITE_THINGS,
-            ThingsManagingFlow.State.DELETING_FAVOURITE_THING -> showFragment(
-                R.id.top_container,
-                ThingsLoadingFragment.newInstance()
-            )
-            ThingsManagingFlow.State.LOADING_RECOMMENDED_THINGS -> showFragment(
-                R.id.bottom_container,
-                ThingsLoadingFragment.newInstance()
-            )
-            ThingsManagingFlow.State.MAKING_THING_FAVOURITE -> {
-                showFragment(
-                    R.id.top_container,
-                    ThingsLoadingFragment.newInstance()
-                )
-                showFragment(
-                    R.id.bottom_container,
-                    ThingsLoadingFragment.newInstance()
-                )
+
+            ThingsManagingFlow.State.LOADING_FAVOURITE_THINGS -> {
+                showFragment(R.id.top_container, ThingsLoadingFragment.newInstance())
             }
-            ThingsManagingFlow.State.SHOWING_ONLY_FAVOURITE_THINGS -> showFragment(
-                R.id.top_container,
-                FavouriteThingsFragment.newInstance()
-            )
-            ThingsManagingFlow.State.SHOWING_FAVOURITE_AND_RECOMMENDED_THINGS -> {
-                showFragment(R.id.top_container, FavouriteThingsFragment.newInstance())
+
+            ThingsManagingFlow.State.SHOWING_FAVOURITE_THINGS -> {
+                if (oldState == ThingsManagingFlow.State.LOADING_FAVOURITE_THINGS)
+                    showFragment(R.id.top_container, FavouriteThingsFragment.newInstance())
+                else if (oldState == ThingsManagingFlow.State.SHOWING_ALL_THINGS)
+                    removeFragment(RecommendedThingsFragment::class.java)
+            }
+
+            ThingsManagingFlow.State.LOADING_RECOMMENDED_THINGS ->
+                showFragment(R.id.bottom_container, ThingsLoadingFragment.newInstance())
+
+            ThingsManagingFlow.State.SHOWING_ALL_THINGS ->
                 showFragment(R.id.bottom_container, RecommendedThingsFragment.newInstance())
+
+            ThingsManagingFlow.State.REFRESHING_ALL_THINGS -> {
+                showFragment(R.id.bottom_container, ThingsLoadingFragment.newInstance())
+            }
+
+            else -> Unit
+        }
+
+        if (newState == ThingsManagingFlow.State.LOADING_FAVOURITE_THINGS ||
+            newState == ThingsManagingFlow.State.SHOWING_FAVOURITE_THINGS
+        ) {
+            recommended_things_loader_button.setOnClickListener {
+                makeEvent(ThingsManagingFlow.Event.RECOMMENDED_THINGS_REQUESTED)
+            }
+        } else if (newState == ThingsManagingFlow.State.LOADING_RECOMMENDED_THINGS ||
+            newState == ThingsManagingFlow.State.SHOWING_ALL_THINGS
+        ) {
+            recommended_things_loader_button.setOnClickListener {
+                makeEvent(ThingsManagingFlow.Event.RECOMMENDED_THINGS_HIDE_REQUESTED)
             }
         }
     }
@@ -74,6 +81,12 @@ class ThingsManagingActivity : AppCompatActivity(),
             .replace(container, fragment, fragment.javaClass.canonicalName)
             .commit()
     }
+
+    private fun <F : Fragment> removeFragment(fragmentClass: Class<F>) =
+        supportFragmentManager
+            .beginTransaction()
+            .remove(supportFragmentManager.findFragmentByTag(fragmentClass.canonicalName)!!)
+            .commit()
 
     override fun finish() {
         FlowManager.finishFlow(flow)
