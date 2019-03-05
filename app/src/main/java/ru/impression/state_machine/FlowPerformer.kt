@@ -4,28 +4,26 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
 
-interface FlowPerformer<F : Flow<E, S>, E : Enum<E>, S : Enum<S>> {
+interface FlowPerformer<F : Flow<*>> {
 
     val flow: Class<F>
 
     fun attachToFlow() {
-        val stateSubject = BehaviorSubject.create<NewStateReceiving>()
-        STATE_SUBJECTS[flow.canonicalName!!]!!.add(stateSubject)
-        DISPOSABLES[flow.canonicalName!!]!!.addAll(stateSubject
+        val actionSubject = BehaviorSubject.create<Flow.Action>()
+        STATE_SUBJECTS[flow.canonicalName!!]!!.add(actionSubject)
+        DISPOSABLES[flow.canonicalName!!]!!.addAll(actionSubject
             .subscribeOn(Schedulers.newThread())
             .observeOn(AndroidSchedulers.mainThread())
-            .subscribe {
-                onNewStateReceived(it.oldState as S?, it.newState as S)
-            }
+            .subscribe({ performAction(it) }) { throw it }
         )
         FLOW_PERFORMER_ATTACH_SUBJECTS[flow.canonicalName!!]!!.onNext(
-            STATE_SUBJECTS[flow.canonicalName!!]!!.indexOf(stateSubject)
+            STATE_SUBJECTS[flow.canonicalName!!]!!.indexOf(actionSubject)
         )
     }
 
-    fun onNewStateReceived(oldState: S?, newState: S)
+    fun performAction(action: Flow.Action)
 
-    fun makeEvent(event: E) {
-        EVENT_SUBJECTS[flow.canonicalName!!]!![event]!!.onNext(Unit)
+    fun performEvent(event: Flow.Event) {
+        EVENT_SUBJECTS[flow.canonicalName!!]!!.onNext(event)
     }
 }

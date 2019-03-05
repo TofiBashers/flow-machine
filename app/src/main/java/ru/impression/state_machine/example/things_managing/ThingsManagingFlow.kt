@@ -2,116 +2,111 @@ package ru.impression.state_machine.example.things_managing
 
 import ru.impression.state_machine.Flow
 
-class ThingsManagingFlow : Flow<ThingsManagingFlow.Event, ThingsManagingFlow.State>() {
+class ThingsManagingFlow : Flow<ThingsManagingFlow.State>(State(false)) {
 
     override fun start() {
 
         // загружаем любимые вещи
-        updateState(State.LOADING_FAVOURITE_THINGS)
+        performAction(LoadFavouriteThings())
 
         // любимые вещи загружены
-        subscribeOnEvent(Event.FAVOURITE_THINGS_LOADED) {
+        subscribeOnEvent<FavouriteThingsLoaded> {
 
             // устанавливаем в качестве основного состояния отображение только любимых вещей
-            updateState(State.SHOWING_FAVOURITE_THINGS, true)
+            performAction(ShowFavouriteThings(it.things))
 
             // пользователь запросил удалить любимую вещь
-            subscribeOnEvent(Event.FAVOURITE_THING_UNLIKED) {
+            subscribeOnEvent<FavouriteThingsUnliked> {
 
                 // удаляем любимую вещь
-                updateState(State.REMOVING_FAVOURITE_THING)
+                performAction(RemoveFavouriteThing(it.thing))
 
-                // любимая вещь удалена
-                subscribeOnEvent(Event.FAVOURITE_THING_REMOVED) {
-
-                    refreshThings()
-                }
+                refreshRecommendedThings()
             }
 
             // пользователь запросил рекомендуемые вещи
-            subscribeOnEvent(Event.RECOMMENDED_THINGS_REQUESTED) {
+            subscribeOnEvent<RecommendedThingsRequested> {
 
                 // загружаем рекомендуемые вещи
-                updateState(State.LOADING_RECOMMENDED_THINGS)
+                performAction(LoadRecommendedThings())
 
                 // рекомендуемые вещи загружены
-                subscribeOnEvent(Event.RECOMMENDED_THINGS_LOADED) {
+                subscribeOnEvent<RecommendedThingsLoaded> {
+
+                    state.manageRecommendedThings = true
 
                     // устанавливаем в качестве основного состояния отображение любимых и рекомендуемых вещей
-                    updateState(State.SHOWING_ALL_THINGS, true)
+                    performAction(ShowRecommendedThings(it.things))
 
                     // пользователю понравилась рекомендуемая вещь
-                    subscribeOnEvent(Event.RECOMMENDED_THING_LIKED) {
+                    subscribeOnEvent<RecommendedThingsLiked> {
 
                         // добавляем понравившуюся вещь в любимые
-                        updateState(State.ADDING_FAVOURITE_THING)
+                        performAction(AddFavouriteThing(it.thing))
 
-                        // понравившаяся вещь добавлена в любимые
-                        subscribeOnEvent(Event.FAVOURITE_THING_ADDED) {
-
-                            refreshThings()
-                        }
+                        refreshRecommendedThings()
                     }
                 }
             }
 
             // пользователь запросил скрыть рекомендуемые вещи
-            subscribeOnEvent(Event.RECOMMENDED_THINGS_HIDE_REQUESTED) {
+            subscribeOnEvent<RecommendedThingsHideRequested> {
 
                 // устанавливаем в качестве основного состояния отображение только любимых вещей
-                updateState(State.SHOWING_FAVOURITE_THINGS, true)
+                performAction(HideRecommendedThings())
+
+                state.manageRecommendedThings = false
             }
         }
     }
 
-    private fun refreshThings() =
+    private fun refreshRecommendedThings() {
 
-        if (primaryState == State.SHOWING_FAVOURITE_THINGS) {
+        if (state.manageRecommendedThings) {
 
-            // обновляем любимые вещи
-            updateState(State.REFRESHING_FAVOURITE_THINGS)
+            // обновляем рекомендованные вещи
+            performAction(RefreshRecommendedThings())
 
-            // любимые вещи обновлены
-            subscribeOnEvent(Event.FAVOURITE_THINGS_REFRESHED) {
+            // рекомендованные вещи обновлены
+            subscribeOnEvent<RecommendedThingsRefreshed> {
 
-                // возвращаемся в основное состояние
-                updateState(primaryState!!)
-            }
-
-        } else {
-
-            // обновляем все вещи
-            updateState(State.REFRESHING_ALL_THINGS)
-
-            // все вещи обновлены
-            subscribeOnEvent(Event.ALL_THINGS_REFRESHED) {
-
-                // возвращаемся в основное состояние
-                updateState(primaryState!!)
+                // отображаем рекомендованные вещи
+                performAction(ShowRecommendedThings(it.things))
             }
         }
-
-    enum class Event {
-        FAVOURITE_THINGS_LOADED,
-        FAVOURITE_THING_UNLIKED,
-        FAVOURITE_THING_ADDED,
-        FAVOURITE_THING_REMOVED,
-        FAVOURITE_THINGS_REFRESHED,
-        RECOMMENDED_THINGS_REQUESTED,
-        RECOMMENDED_THINGS_LOADED,
-        RECOMMENDED_THING_LIKED,
-        RECOMMENDED_THINGS_HIDE_REQUESTED,
-        ALL_THINGS_REFRESHED
     }
 
-    enum class State {
-        LOADING_FAVOURITE_THINGS,
-        SHOWING_FAVOURITE_THINGS,
-        ADDING_FAVOURITE_THING,
-        REMOVING_FAVOURITE_THING,
-        REFRESHING_FAVOURITE_THINGS,
-        LOADING_RECOMMENDED_THINGS,
-        SHOWING_ALL_THINGS,
-        REFRESHING_ALL_THINGS,
-    }
+    class State(
+        var manageRecommendedThings: Boolean
+    ) : Flow.State()
 }
+
+class LoadFavouriteThings : Flow.Action()
+
+class FavouriteThingsLoaded(val things: List<String>) : Flow.Event()
+
+class ShowFavouriteThings(val things: List<String>) : Flow.Action()
+
+class FavouriteThingsUnliked(val thing: String) : Flow.Event()
+
+class RemoveFavouriteThing(val thing: String) : Flow.Action()
+
+class RecommendedThingsRequested : Flow.Event()
+
+class LoadRecommendedThings : Flow.Action()
+
+class RecommendedThingsLoaded(val things: List<String>) : Flow.Event()
+
+class ShowRecommendedThings(val things: List<String>) : Flow.Action()
+
+class RecommendedThingsLiked(val thing: String) : Flow.Event()
+
+class AddFavouriteThing(val thing: String) : Flow.Action()
+
+class RefreshRecommendedThings : Flow.Action()
+
+class RecommendedThingsRefreshed(val things: List<String>) : Flow.Event()
+
+class RecommendedThingsHideRequested : Flow.Event()
+
+class HideRecommendedThings : Flow.Action()

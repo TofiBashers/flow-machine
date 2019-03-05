@@ -5,16 +5,16 @@ import io.reactivex.subjects.BehaviorSubject
 
 object FlowManager {
 
-    fun <F : Flow<*, *>> startFlow(flow: Class<F>) {
+    fun <F : Flow<*>> startFlow(flow: Class<F>) {
         val flowInstance = flow.newInstance()
         DISPOSABLES[flow.canonicalName!!] = CompositeDisposable()
         FLOW_PERFORMER_ATTACH_SUBJECTS[flow.canonicalName!!] = BehaviorSubject.create()
-        EVENT_SUBJECTS[flow.canonicalName!!] = HashMap()
+        EVENT_SUBJECTS[flow.canonicalName!!] = BehaviorSubject.create()
         STATE_SUBJECTS[flow.canonicalName!!] = ArrayList()
         flowInstance.startInternal()
     }
 
-    fun <F : Flow<*, *>> finishFlow(flow: Class<F>) {
+    fun <F : Flow<*>> finishFlow(flow: Class<F>) {
         DISPOSABLES[flow.canonicalName!!]!!.dispose()
         DISPOSABLES.remove(flow.canonicalName!!)
         EVENT_SUBJECTS.remove(flow.canonicalName!!)

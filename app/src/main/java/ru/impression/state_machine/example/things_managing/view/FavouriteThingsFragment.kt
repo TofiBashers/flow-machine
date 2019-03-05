@@ -2,27 +2,32 @@ package ru.impression.state_machine.example.things_managing.view
 
 import android.view.View
 import android.widget.ListView
-import ru.impression.state_machine.example.things_managing.ThingsManagingFlow
+import ru.impression.state_machine.Flow
+import ru.impression.state_machine.example.things_managing.AddFavouriteThing
+import ru.impression.state_machine.example.things_managing.FavouriteThingsUnliked
+import ru.impression.state_machine.example.things_managing.RemoveFavouriteThing
+import ru.impression.state_machine.example.things_managing.ShowFavouriteThings
 
 class FavouriteThingsFragment : ThingsFragment() {
-
-    override fun onNewStateReceived(oldState: ThingsManagingFlow.State?, newState: ThingsManagingFlow.State) {
-        when (newState) {
-            ThingsManagingFlow.State.REFRESHING_FAVOURITE_THINGS -> {
+    override fun performAction(action: Flow.Action) {
+        when (action) {
+            is ShowFavouriteThings -> {
+                adapterData.addAll(action.things)
                 updateAdapter()
-                makeEvent(ThingsManagingFlow.Event.FAVOURITE_THINGS_REFRESHED)
             }
-            ThingsManagingFlow.State.REFRESHING_ALL_THINGS -> updateAdapter()
-            else -> Unit
+            is RemoveFavouriteThing -> {
+                adapterData.remove(action.thing)
+                updateAdapter()
+            }
+            is AddFavouriteThing -> {
+                adapterData.add(action.thing)
+                updateAdapter()
+            }
         }
     }
 
-    override val thingsListAdapterData: ArrayList<String>
-        get() = model.favouriteThings
-
     override fun onListItemClick(l: ListView?, v: View?, position: Int, id: Long) {
-        model.unlikedFavouriteThing = thingsListAdapterData[position]
-        makeEvent(ThingsManagingFlow.Event.FAVOURITE_THING_UNLIKED)
+        performEvent(FavouriteThingsUnliked(adapterData[position]))
     }
 
     companion object {

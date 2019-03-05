@@ -1,10 +1,10 @@
 package ru.impression.state_machine
 
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.BehaviorSubject
 
+abstract class Flow<S : Flow.State>(val state: S) {
 
-abstract class Flow<E : Enum<E>, S : Enum<S>> {
+    private lateinit var lastAction: Action
 
     protected abstract fun start()
 
@@ -14,38 +14,29 @@ abstract class Flow<E : Enum<E>, S : Enum<S>> {
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(Schedulers.newThread())
                 .subscribe {
-                    makeNewStateReceiving(STATE_SUBJECTS[javaClass.canonicalName!!]!![it])
+                    STATE_SUBJECTS[javaClass.canonicalName!!]!![it].onNext(lastAction)
                 }
         )
         start()
     }
 
-    protected var currentState: S? = null
-
-    protected var lastState: S? = null
-
-    protected var primaryState: S? = null
-
-    protected fun subscribeOnEvent(event: E, onEvent: () -> Unit) {
-        val eventSubject = BehaviorSubject.create<Unit>()
-        EVENT_SUBJECTS[javaClass.canonicalName!!]!![event] = eventSubject
-        DISPOSABLES[javaClass.canonicalName!!]!!.addAll(eventSubject
-            .subscribeOn(Schedulers.newThread())
-            .observeOn(Schedulers.newThread())
-            .subscribe { onEvent.invoke() }
+    protected inline fun <reified E : Event> subscribeOnEvent(crossinline onEvent: (E) -> Unit) {
+        DISPOSABLES[javaClass.canonicalName!!]!!.addAll(
+            EVENT_SUBJECTS[javaClass.canonicalName!!]!!.map { if (it is E) onEvent(it) }
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(Schedulers.newThread())
+                .subscribe()
         )
     }
 
-    protected fun updateState(state: S, makePrimary: Boolean = false) {
-        lastState = currentState
-        currentState = state
-        if (makePrimary) {
-            primaryState = state
-        }
-        STATE_SUBJECTS[javaClass.canonicalName!!]!!.forEach { makeNewStateReceiving(it) }
+    protected fun performAction(action: Action) {
+        lastAction = action
+        STATE_SUBJECTS[javaClass.canonicalName!!]!!.forEach { it.onNext(action) }
     }
 
-    private fun makeNewStateReceiving(stateSubject: BehaviorSubject<NewStateReceiving>) = stateSubject.onNext(
-        NewStateReceiving(lastState, currentState!!)
-    )
+    abstract class Event
+
+    abstract class State
+
+    abstract class Action
 }

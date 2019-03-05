@@ -2,70 +2,44 @@ package ru.impression.state_machine.example.things_managing.view.model
 
 import android.arch.lifecycle.ViewModel
 import com.maximeroussy.invitrode.WordGenerator
+import ru.impression.state_machine.Flow
 import ru.impression.state_machine.FlowPerformer
-import ru.impression.state_machine.example.things_managing.ThingsManagingFlow
+import ru.impression.state_machine.example.things_managing.*
 import java.util.*
+import kotlin.collections.ArrayList
 import kotlin.concurrent.thread
 
-class ThingsManagingModel : ViewModel(),
-    FlowPerformer<ThingsManagingFlow, ThingsManagingFlow.Event, ThingsManagingFlow.State> {
+class ThingsManagingModel : ViewModel(), FlowPerformer<ThingsManagingFlow> {
 
     override val flow = ThingsManagingFlow::class.java
+
+    private val favouriteThings = arrayListOf("vodka", "spice", "bitches", "money", "black-jack", "cocaine")
+
+    private val recommendedThings
+        get () = ArrayList<String>().apply {
+            for (i in 0..6) {
+                add(WordGenerator().newWord(Random().nextInt(10) + 3))
+            }
+        }
 
     init {
         attachToFlow()
     }
 
-    override fun onNewStateReceived(oldState: ThingsManagingFlow.State?, newState: ThingsManagingFlow.State) {
-        when (newState) {
-            ThingsManagingFlow.State.LOADING_FAVOURITE_THINGS -> loadFavouriteThings()
-            ThingsManagingFlow.State.ADDING_FAVOURITE_THING -> addFavouriteThing()
-            ThingsManagingFlow.State.REMOVING_FAVOURITE_THING -> removeFavouriteThing()
-            ThingsManagingFlow.State.LOADING_RECOMMENDED_THINGS -> loadRecommendedThings()
-            ThingsManagingFlow.State.REFRESHING_ALL_THINGS -> refreshRecommendedThings()
-            else -> Unit
+    override fun performAction(action: Flow.Action) {
+        when (action) {
+            is LoadFavouriteThings -> thread {
+                Thread.sleep(1000)
+                performEvent(FavouriteThingsLoaded(favouriteThings))
+            }
+            is LoadRecommendedThings -> thread {
+                Thread.sleep(1000)
+                performEvent(RecommendedThingsLoaded(recommendedThings))
+            }
+            is RefreshRecommendedThings -> thread {
+                Thread.sleep(1000)
+                performEvent(RecommendedThingsRefreshed(recommendedThings))
+            }
         }
-    }
-
-    lateinit var favouriteThings: ArrayList<String>
-
-    lateinit var unlikedFavouriteThing: String
-
-    lateinit var recommendedThings: ArrayList<String>
-
-    lateinit var likedRecommendedThing: String
-
-    private fun loadFavouriteThings() = thread {
-        Thread.sleep(1000)
-        favouriteThings = arrayListOf("vodka", "spice", "bitches", "money", "black-jack", "cocaine")
-        makeEvent(ThingsManagingFlow.Event.FAVOURITE_THINGS_LOADED)
-    }
-
-    private fun addFavouriteThing() = thread {
-        favouriteThings.add(likedRecommendedThing)
-        makeEvent(ThingsManagingFlow.Event.FAVOURITE_THING_ADDED)
-    }
-
-    private fun removeFavouriteThing() = thread {
-        favouriteThings.remove(unlikedFavouriteThing)
-        makeEvent(ThingsManagingFlow.Event.FAVOURITE_THING_REMOVED)
-    }
-
-    private fun loadRecommendedThings() = thread {
-        Thread.sleep(1000)
-        recommendedThings = ArrayList()
-        for (i in 0..6) {
-            recommendedThings.add(WordGenerator().newWord(Random().nextInt(10) + 3))
-        }
-        makeEvent(ThingsManagingFlow.Event.RECOMMENDED_THINGS_LOADED)
-    }
-
-    private fun refreshRecommendedThings() = thread {
-        Thread.sleep(1000)
-        recommendedThings = ArrayList()
-        for (i in 0..6) {
-            recommendedThings.add(WordGenerator().newWord(Random().nextInt(10) + 3))
-        }
-        makeEvent(ThingsManagingFlow.Event.ALL_THINGS_REFRESHED)
     }
 }
