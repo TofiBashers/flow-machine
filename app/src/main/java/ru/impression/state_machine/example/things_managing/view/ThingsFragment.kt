@@ -20,6 +20,8 @@ abstract class ThingsFragment : ListFragment(), FlowPerformer<ThingsManagingFlow
     }
 
     protected fun updateAdapter() {
-        listAdapter = ArrayAdapter<String>(context!!, android.R.layout.simple_list_item_1, adapterData)
+        activity?.let {
+            listAdapter = ArrayAdapter<String>(activity!!, android.R.layout.simple_list_item_1, adapterData)
+        }
     }
 }

@@ -27,24 +27,31 @@ class ThingsManagingFlow : Flow<ThingsManagingFlow.State>(State(false)) {
             // пользователь запросил рекомендуемые вещи
             subscribeOnEvent<RecommendedThingsRequested> {
 
+                state.manageRecommendedThings = true
+
                 // загружаем рекомендуемые вещи
                 performAction(LoadRecommendedThings())
 
                 // рекомендуемые вещи загружены
                 subscribeOnEvent<RecommendedThingsLoaded> {
 
-                    state.manageRecommendedThings = true
+                    if (state.manageRecommendedThings) {
 
-                    // устанавливаем в качестве основного состояния отображение любимых и рекомендуемых вещей
-                    performAction(ShowRecommendedThings(it.things))
+                        // устанавливаем в качестве основного состояния отображение любимых и рекомендуемых вещей
+                        performAction(ShowRecommendedThings(it.things))
 
-                    // пользователю понравилась рекомендуемая вещь
-                    subscribeOnEvent<RecommendedThingsLiked> {
+                        // пользователю понравилась рекомендуемая вещь
+                        subscribeOnEvent<RecommendedThingsLiked> {
 
-                        // добавляем понравившуюся вещь в любимые
-                        performAction(AddFavouriteThing(it.thing))
+                            // добавляем понравившуюся вещь в любимые
+                            performAction(AddFavouriteThing(it.thing))
 
-                        refreshRecommendedThings()
+                            refreshRecommendedThings()
+                        }
+                    } else {
+
+                        // устанавливаем в качестве основного состояния отображение любимых и рекомендуемых вещей
+                        performAction(CancelLoadingRecommendedThings())
                     }
                 }
             }
@@ -96,6 +103,8 @@ class RecommendedThingsRequested : Flow.Event()
 class LoadRecommendedThings : Flow.Action()
 
 class RecommendedThingsLoaded(val things: List<String>) : Flow.Event()
+
+class CancelLoadingRecommendedThings() : Flow.Action()
 
 class ShowRecommendedThings(val things: List<String>) : Flow.Action()
 

@@ -49,7 +49,9 @@ class ThingsManagingActivity : AppCompatActivity(), FlowPerformer<ThingsManaging
             is ShowFavouriteThings -> showFragment(R.id.top_container, FavouriteThingsFragment.newInstance())
             is LoadRecommendedThings, is RefreshRecommendedThings ->
                 showFragment(R.id.bottom_container, ThingsLoadingFragment.newInstance())
+            is CancelLoadingRecommendedThings -> removeFragment(ThingsLoadingFragment::class.java)
             is ShowRecommendedThings -> showFragment(R.id.bottom_container, RecommendedThingsFragment.newInstance())
+            is HideRecommendedThings -> removeFragment(RecommendedThingsFragment::class.java)
         }
     }
 
@@ -59,6 +61,14 @@ class ThingsManagingActivity : AppCompatActivity(), FlowPerformer<ThingsManaging
             .replace(container, fragment, fragment.javaClass.canonicalName)
             .commit()
     }
+
+    private fun <F : Fragment> removeFragment(fragment: Class<F>) =
+        supportFragmentManager.findFragmentByTag(fragment.canonicalName)?.let {
+            supportFragmentManager
+                .beginTransaction()
+                .remove(it)
+                .commit()
+        }
 
     override fun finish() {
         FlowManager.finishFlow(flow)

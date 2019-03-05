@@ -13,9 +13,7 @@ abstract class Flow<S : Flow.State>(val state: S) {
             FLOW_PERFORMER_ATTACH_SUBJECTS[javaClass.canonicalName!!]!!
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(Schedulers.newThread())
-                .subscribe {
-                    STATE_SUBJECTS[javaClass.canonicalName!!]!![it].onNext(lastAction)
-                }
+                .subscribe({ ACTION_SUBJECTS[javaClass.canonicalName!!]!![it].onNext(lastAction) }) { throw it }
         )
         start()
     }
@@ -25,13 +23,14 @@ abstract class Flow<S : Flow.State>(val state: S) {
             EVENT_SUBJECTS[javaClass.canonicalName!!]!!.map { if (it is E) onEvent(it) }
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(Schedulers.newThread())
+                .doOnError { throw it }
                 .subscribe()
         )
     }
 
     protected fun performAction(action: Action) {
         lastAction = action
-        STATE_SUBJECTS[javaClass.canonicalName!!]!!.forEach { it.onNext(action) }
+        ACTION_SUBJECTS[javaClass.canonicalName!!]!!.forEach { it.onNext(action) }
     }
 
     abstract class Event

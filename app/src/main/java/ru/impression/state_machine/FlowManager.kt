@@ -10,7 +10,7 @@ object FlowManager {
         DISPOSABLES[flow.canonicalName!!] = CompositeDisposable()
         FLOW_PERFORMER_ATTACH_SUBJECTS[flow.canonicalName!!] = BehaviorSubject.create()
         EVENT_SUBJECTS[flow.canonicalName!!] = BehaviorSubject.create()
-        STATE_SUBJECTS[flow.canonicalName!!] = ArrayList()
+        ACTION_SUBJECTS[flow.canonicalName!!] = ArrayList()
         flowInstance.startInternal()
     }
 
@@ -18,6 +18,6 @@ object FlowManager {
         DISPOSABLES[flow.canonicalName!!]!!.dispose()
         DISPOSABLES.remove(flow.canonicalName!!)
         EVENT_SUBJECTS.remove(flow.canonicalName!!)
-        STATE_SUBJECTS.remove(flow.canonicalName!!)
+        ACTION_SUBJECTS.remove(flow.canonicalName!!)
     }
 }

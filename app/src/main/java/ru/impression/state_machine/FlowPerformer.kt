@@ -10,14 +10,14 @@ interface FlowPerformer<F : Flow<*>> {
 
     fun attachToFlow() {
         val actionSubject = BehaviorSubject.create<Flow.Action>()
-        STATE_SUBJECTS[flow.canonicalName!!]!!.add(actionSubject)
+        ACTION_SUBJECTS[flow.canonicalName!!]!!.add(actionSubject)
         DISPOSABLES[flow.canonicalName!!]!!.addAll(actionSubject
             .subscribeOn(Schedulers.newThread())
             .observeOn(AndroidSchedulers.mainThread())
             .subscribe({ performAction(it) }) { throw it }
         )
         FLOW_PERFORMER_ATTACH_SUBJECTS[flow.canonicalName!!]!!.onNext(
-            STATE_SUBJECTS[flow.canonicalName!!]!!.indexOf(actionSubject)
+            ACTION_SUBJECTS[flow.canonicalName!!]!!.indexOf(actionSubject)
         )
     }
 
