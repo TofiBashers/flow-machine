@@ -5,7 +5,7 @@ import android.widget.ListView
 import ru.impression.state_machine.Flow
 import ru.impression.state_machine.example.things_managing.*
 
-class FavouriteThingsFragment : ThingsFragment() {
+class FavouriteThingsManagingFragment : ThingsManagingFragment() {
     override fun performAction(action: Flow.Action) {
         when (action) {
             is ShowFavouriteThings -> {
@@ -30,6 +30,6 @@ class FavouriteThingsFragment : ThingsFragment() {
     }
 
     companion object {
-        fun newInstance() = FavouriteThingsFragment()
+        fun newInstance() = FavouriteThingsManagingFragment()
     }
 }

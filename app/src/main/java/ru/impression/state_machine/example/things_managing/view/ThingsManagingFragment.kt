@@ -7,7 +7,7 @@ import android.widget.ArrayAdapter
 import ru.impression.state_machine.FlowPerformer
 import ru.impression.state_machine.example.things_managing.ThingsManagingFlow
 
-abstract class ThingsFragment : ListFragment(), FlowPerformer<ThingsManagingFlow> {
+abstract class ThingsManagingFragment : ListFragment(), FlowPerformer<ThingsManagingFlow> {
 
     override val flow = ThingsManagingFlow::class.java
 
@@ -20,6 +20,11 @@ abstract class ThingsFragment : ListFragment(), FlowPerformer<ThingsManagingFlow
     }
 
     protected fun updateAdapter() {
-            listAdapter = ArrayAdapter<String>(activity!!, android.R.layout.simple_list_item_1, adapterData)
+        listAdapter = ArrayAdapter<String>(activity!!, android.R.layout.simple_list_item_1, adapterData)
+    }
+
+    override fun onDestroy() {
+        detachFromFlow()
+        super.onDestroy()
     }
 }

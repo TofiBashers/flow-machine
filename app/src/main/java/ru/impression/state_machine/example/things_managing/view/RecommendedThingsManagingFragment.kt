@@ -6,7 +6,7 @@ import ru.impression.state_machine.Flow
 import ru.impression.state_machine.example.things_managing.RecommendedThingsLiked
 import ru.impression.state_machine.example.things_managing.ShowRecommendedThings
 
-class RecommendedThingsFragment : ThingsFragment() {
+class RecommendedThingsManagingFragment : ThingsManagingFragment() {
 
     override fun performAction(action: Flow.Action) {
         when (action) {
@@ -22,6 +22,6 @@ class RecommendedThingsFragment : ThingsFragment() {
     }
 
     companion object {
-        fun newInstance() = RecommendedThingsFragment()
+        fun newInstance() = RecommendedThingsManagingFragment()
     }
 }

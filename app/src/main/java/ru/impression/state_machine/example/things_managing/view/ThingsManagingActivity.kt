@@ -5,6 +5,7 @@ import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.support.v7.app.AppCompatActivity
+import android.widget.Button
 import kotlinx.android.synthetic.main.activity_things_managing.*
 import ru.impression.state_machine.Flow
 import ru.impression.state_machine.FlowManager
@@ -31,11 +32,11 @@ class ThingsManagingActivity : AppCompatActivity(), FlowPerformer<ThingsManaging
             .get(ThingsManagingModel::class.java)
 
         recommended_things_loader_button.setOnClickListener {
-            if (it.tag == "SHOW") {
-                it.tag = "HIDE"
+            if ((it as Button).text == "Показать") {
+                it.text = "Скрыть"
                 onEvent(RecommendedThingsRequested())
             } else {
-                it.tag = "SHOW"
+                it.text = "Показать"
                 onEvent(RecommendedThingsHideRequested())
             }
         }
@@ -46,18 +47,19 @@ class ThingsManagingActivity : AppCompatActivity(), FlowPerformer<ThingsManaging
     override fun performAction(action: Flow.Action) {
         when (action) {
             is LoadFavouriteThings -> showFragment(R.id.top_container, ThingsLoadingFragment.newInstance())
-            is ShowFavouriteThings -> showFragment(R.id.top_container, FavouriteThingsFragment.newInstance())
+            is ShowFavouriteThings -> showFragment(R.id.top_container, FavouriteThingsManagingFragment.newInstance())
             is LoadRecommendedThings -> showFragment(R.id.bottom_container, ThingsLoadingFragment.newInstance())
             is CancelLoadingRecommendedThings -> removeFragment(ThingsLoadingFragment::class.java)
-            is ShowRecommendedThings -> showFragment(R.id.bottom_container, RecommendedThingsFragment.newInstance())
-            is HideRecommendedThings -> removeFragment(RecommendedThingsFragment::class.java)
+            is ShowRecommendedThings ->
+                showFragment(R.id.bottom_container, RecommendedThingsManagingFragment.newInstance())
+            is HideRecommendedThings -> removeFragment(RecommendedThingsManagingFragment::class.java)
         }
     }
 
     private fun showFragment(container: Int, fragment: Fragment) {
         supportFragmentManager
             .beginTransaction()
-            .replace(container, fragment, fragment.javaClass.canonicalName)
+            .replace(container, fragment, fragment::class.java.canonicalName)
             .commit()
     }
 
@@ -70,6 +72,7 @@ class ThingsManagingActivity : AppCompatActivity(), FlowPerformer<ThingsManaging
         }
 
     override fun finish() {
+        detachFromFlow()
         FlowManager.finishFlow(flow)
         super.finish()
     }

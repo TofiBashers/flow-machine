@@ -13,5 +13,3 @@ val DISPOSABLES: ConcurrentHashMap<String, CompositeDisposable> = ConcurrentHash
 val EVENT_SUBJECTS: ConcurrentHashMap<String, BehaviorSubject<Flow.Event>> = ConcurrentHashMap()
 
 internal val ACTION_SUBJECTS: ConcurrentHashMap<String, ReplaySubject<Flow.Action>> = ConcurrentHashMap()
-
-

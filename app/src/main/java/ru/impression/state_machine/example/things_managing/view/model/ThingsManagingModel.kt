@@ -22,8 +22,15 @@ class ThingsManagingModel : ViewModel(), FlowPerformer<ThingsManagingFlow> {
             }
         }
 
+    private lateinit var loadingRecommendedThingsThread: Thread
+
     init {
         attachToFlow()
+    }
+
+    override fun onCleared() {
+        detachFromFlow()
+        super.onCleared()
     }
 
     override fun performAction(action: Flow.Action) {
@@ -32,14 +39,18 @@ class ThingsManagingModel : ViewModel(), FlowPerformer<ThingsManagingFlow> {
                 Thread.sleep(1000)
                 onEvent(FavouriteThingsLoaded(favouriteThings))
             }
-            is LoadRecommendedThings -> thread {
-                Thread.sleep(1000)
-                onEvent(RecommendedThingsLoaded(recommendedThings))
+            is LoadRecommendedThings -> {
+                loadingRecommendedThingsThread = Thread(Runnable {
+                    try {
+                        Thread.sleep(1000)
+                        onEvent(RecommendedThingsLoaded(recommendedThings))
+                    } catch (e: InterruptedException) {
+                    }
+                })
+                loadingRecommendedThingsThread.start()
             }
-            is RefreshRecommendedThings -> thread {
-                Thread.sleep(1000)
-                onEvent(RecommendedThingsRefreshed(recommendedThings))
-            }
+            is CancelLoadingRecommendedThings -> loadingRecommendedThingsThread.interrupt()
         }
     }
+
 }
