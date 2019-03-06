@@ -55,9 +55,9 @@ class ThingsManagingFlow : Flow<ThingsManagingFlow.State>(State()) {
                 if (state.showingRecommendedThings) {
 
                     // обновляем рекомендованные вещи
-                    performAction(RefreshRecommendedThings())
+                    performAction(LoadRecommendedThings())
 
-                    state.loadingRecommendedThings
+                    state.loadingRecommendedThings = true
 
                     // рекомендованные вещи обновлены
                     subscribeOnEvent<RecommendedThingsRefreshed> {
@@ -123,8 +123,6 @@ class RecommendedThingsLiked(val thing: String) : Flow.Event()
 class AddFavouriteThing(val thing: String) : Flow.Action()
 
 class FavouriteThingsUpdated : Flow.Event()
-
-class RefreshRecommendedThings : Flow.Action()
 
 class RecommendedThingsRefreshed(val things: List<String>) : Flow.Event()
 

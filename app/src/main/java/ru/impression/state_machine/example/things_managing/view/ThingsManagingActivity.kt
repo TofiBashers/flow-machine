@@ -47,8 +47,7 @@ class ThingsManagingActivity : AppCompatActivity(), FlowPerformer<ThingsManaging
         when (action) {
             is LoadFavouriteThings -> showFragment(R.id.top_container, ThingsLoadingFragment.newInstance())
             is ShowFavouriteThings -> showFragment(R.id.top_container, FavouriteThingsFragment.newInstance())
-            is LoadRecommendedThings, is RefreshRecommendedThings ->
-                showFragment(R.id.bottom_container, ThingsLoadingFragment.newInstance())
+            is LoadRecommendedThings -> showFragment(R.id.bottom_container, ThingsLoadingFragment.newInstance())
             is CancelLoadingRecommendedThings -> removeFragment(ThingsLoadingFragment::class.java)
             is ShowRecommendedThings -> showFragment(R.id.bottom_container, RecommendedThingsFragment.newInstance())
             is HideRecommendedThings -> removeFragment(RecommendedThingsFragment::class.java)
