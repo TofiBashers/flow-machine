@@ -30,15 +30,15 @@ class ThingsManagingModel : ViewModel(), FlowPerformer<ThingsManagingFlow> {
         when (action) {
             is LoadFavouriteThings -> thread {
                 Thread.sleep(1000)
-                performEvent(FavouriteThingsLoaded(favouriteThings))
+                onEvent(FavouriteThingsLoaded(favouriteThings))
             }
             is LoadRecommendedThings -> thread {
                 Thread.sleep(1000)
-                performEvent(RecommendedThingsLoaded(recommendedThings))
+                onEvent(RecommendedThingsLoaded(recommendedThings))
             }
             is RefreshRecommendedThings -> thread {
                 Thread.sleep(1000)
-                performEvent(RecommendedThingsRefreshed(recommendedThings))
+                onEvent(RecommendedThingsRefreshed(recommendedThings))
             }
         }
     }

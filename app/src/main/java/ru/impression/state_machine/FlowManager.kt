@@ -2,22 +2,23 @@ package ru.impression.state_machine
 
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
+import io.reactivex.subjects.ReplaySubject
 
 object FlowManager {
 
-    fun <F : Flow<*>> startFlow(flow: Class<F>) {
+    fun <F : Flow<*>> startFlow(flow: Class<F>) = flow.canonicalName?.let { flowName ->
         val flowInstance = flow.newInstance()
-        DISPOSABLES[flow.canonicalName!!] = CompositeDisposable()
-        FLOW_PERFORMER_ATTACH_SUBJECTS[flow.canonicalName!!] = BehaviorSubject.create()
-        EVENT_SUBJECTS[flow.canonicalName!!] = BehaviorSubject.create()
-        ACTION_SUBJECTS[flow.canonicalName!!] = ArrayList()
-        flowInstance.startInternal()
+        DISPOSABLES[flowName] = CompositeDisposable()
+        EVENT_SUBJECTS[flowName] = BehaviorSubject.create()
+        ACTION_SUBJECTS[flowName] = ReplaySubject.createWithSize(1)
+        flowInstance.start()
     }
 
-    fun <F : Flow<*>> finishFlow(flow: Class<F>) {
-        DISPOSABLES[flow.canonicalName!!]!!.dispose()
-        DISPOSABLES.remove(flow.canonicalName!!)
-        EVENT_SUBJECTS.remove(flow.canonicalName!!)
-        ACTION_SUBJECTS.remove(flow.canonicalName!!)
-    }
+    fun <F : Flow<*>> finishFlow(flow: Class<F>) =
+        flow.canonicalName?.let { flowName ->
+            DISPOSABLES[flowName]?.dispose()
+            DISPOSABLES.remove(flowName)
+            EVENT_SUBJECTS.remove(flowName)
+            ACTION_SUBJECTS.remove(flowName)
+        }
 }

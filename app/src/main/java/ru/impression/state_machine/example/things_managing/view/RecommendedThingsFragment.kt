@@ -18,7 +18,7 @@ class RecommendedThingsFragment : ThingsFragment() {
     }
 
     override fun onListItemClick(l: ListView?, v: View?, position: Int, id: Long) {
-        performEvent(RecommendedThingsLiked(adapterData[position]))
+        onEvent(RecommendedThingsLiked(adapterData[position]))
     }
 
     companion object {

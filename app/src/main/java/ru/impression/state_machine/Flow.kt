@@ -4,33 +4,28 @@ import io.reactivex.schedulers.Schedulers
 
 abstract class Flow<S : Flow.State>(val state: S) {
 
-    private lateinit var lastAction: Action
+    protected val subscribedOnEvents = ArrayList<String>()
 
-    protected abstract fun start()
+    abstract fun start()
 
-    internal fun startInternal() {
-        DISPOSABLES[javaClass.canonicalName!!]!!.addAll(
-            FLOW_PERFORMER_ATTACH_SUBJECTS[javaClass.canonicalName!!]!!
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(Schedulers.newThread())
-                .subscribe({ ACTION_SUBJECTS[javaClass.canonicalName!!]!![it].onNext(lastAction) }) { throw it }
-        )
-        start()
-    }
+    protected inline fun <reified E : Event> subscribeOnEvent(crossinline onEvent: (E) -> Unit) =
+        E::class.java.canonicalName?.let { eventName ->
+            if (!subscribedOnEvents.contains(eventName)) {
+                javaClass.canonicalName?.let { thisName ->
+                    EVENT_SUBJECTS[thisName]
+                        ?.subscribeOn(Schedulers.newThread())
+                        ?.observeOn(Schedulers.newThread())
+                        ?.subscribe({ event -> if (event is E) onEvent(event) }) { throw  it }
+                        ?.let { disposable ->
+                            DISPOSABLES[thisName]?.addAll(disposable)
+                            subscribedOnEvents.add(eventName)
+                        }
+                }
+            }
+        }
 
-    protected inline fun <reified E : Event> subscribeOnEvent(crossinline onEvent: (E) -> Unit) {
-        DISPOSABLES[javaClass.canonicalName!!]!!.addAll(
-            EVENT_SUBJECTS[javaClass.canonicalName!!]!!.map { if (it is E) onEvent(it) }
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(Schedulers.newThread())
-                .doOnError { throw it }
-                .subscribe()
-        )
-    }
-
-    protected fun performAction(action: Action) {
-        lastAction = action
-        ACTION_SUBJECTS[javaClass.canonicalName!!]!!.forEach { it.onNext(action) }
+    protected fun performAction(action: Action) = javaClass.canonicalName?.let { thisName ->
+        ACTION_SUBJECTS[thisName]?.onNext(action)
     }
 
     abstract class Event

@@ -1,29 +1,34 @@
 package ru.impression.state_machine
 
 import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
-import io.reactivex.subjects.BehaviorSubject
 
 interface FlowPerformer<F : Flow<*>> {
 
     val flow: Class<F>
 
-    fun attachToFlow() {
-        val actionSubject = BehaviorSubject.create<Flow.Action>()
-        ACTION_SUBJECTS[flow.canonicalName!!]!!.add(actionSubject)
-        DISPOSABLES[flow.canonicalName!!]!!.addAll(actionSubject
-            .subscribeOn(Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ performAction(it) }) { throw it }
-        )
-        FLOW_PERFORMER_ATTACH_SUBJECTS[flow.canonicalName!!]!!.onNext(
-            ACTION_SUBJECTS[flow.canonicalName!!]!!.indexOf(actionSubject)
-        )
+    fun attachToFlow() = flow.canonicalName?.let { flowName ->
+        javaClass.canonicalName?.let { thisName ->
+            DISPOSABLES[thisName] = CompositeDisposable().apply {
+                addAll(
+                    ACTION_SUBJECTS[flowName]
+                        ?.subscribeOn(Schedulers.newThread())
+                        ?.observeOn(AndroidSchedulers.mainThread())
+                        ?.subscribe({ performAction(it) }) { throw it }
+                )
+            }
+        }
     }
 
     fun performAction(action: Flow.Action)
 
-    fun performEvent(event: Flow.Event) {
-        EVENT_SUBJECTS[flow.canonicalName!!]!!.onNext(event)
+    fun onEvent(event: Flow.Event) = flow.canonicalName?.let { flowName ->
+        EVENT_SUBJECTS[flowName]?.onNext(event)
+    }
+
+    fun detachFromFlow() = javaClass.canonicalName?.let { thisName ->
+        DISPOSABLES[thisName]?.dispose()
+        DISPOSABLES.remove(thisName)
     }
 }

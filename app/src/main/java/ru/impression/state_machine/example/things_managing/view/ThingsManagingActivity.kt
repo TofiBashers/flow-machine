@@ -33,10 +33,10 @@ class ThingsManagingActivity : AppCompatActivity(), FlowPerformer<ThingsManaging
         recommended_things_loader_button.setOnClickListener {
             if (it.tag == "SHOW") {
                 it.tag = "HIDE"
-                performEvent(RecommendedThingsRequested())
+                onEvent(RecommendedThingsRequested())
             } else {
                 it.tag = "SHOW"
-                performEvent(RecommendedThingsHideRequested())
+                onEvent(RecommendedThingsHideRequested())
             }
         }
 
