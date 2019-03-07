@@ -1,4 +1,4 @@
-package ru.impression.ebsm
+package ru.impression.flow
 
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
