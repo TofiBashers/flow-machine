@@ -17,6 +17,31 @@ abstract class Flow<S : Flow.State>(val state: S) {
                 }
         }
 
+    protected inline fun <reified E1 : Event, reified E2 : Event> subscribeOnSeriesOfEvents(
+        crossinline onEvent: (E1, E2) -> Unit
+    ) =
+        javaClass.canonicalName?.let { thisName ->
+            EVENT_SUBJECTS[thisName]?.let { eventSubject ->
+                DISPOSABLES[thisName]?.addAll(eventSubject
+                    .publish { source ->
+                        source
+                            .buffer(1)
+                            .filter { it is E1 }
+                    }
+                    .publish { source ->
+                        source
+                            .map { it[0] }
+                            .buffer(1)
+                            .filter { it is E2 }
+                    }
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(Schedulers.newThread())
+                    .subscribe({ onEvent(it[0] as E1, it[1] as E2) }) { throw  it }
+
+                )
+            }
+        }
+
     protected fun performAction(action: Action) = javaClass.canonicalName?.let { thisName ->
         ACTION_SUBJECTS[thisName]?.onNext(action)
     }
