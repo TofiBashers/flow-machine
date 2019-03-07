@@ -1,6 +1,8 @@
 package ru.impression.flow
 
+import android.util.Log
 import io.reactivex.schedulers.Schedulers
+import java.util.*
 
 abstract class Flow<S : Flow.State>(val state: S) {
 
@@ -50,7 +52,12 @@ abstract class Flow<S : Flow.State>(val state: S) {
                 .filter { classes.contains(it::class.java) }
                 .buffer(classes.size)
                 .filter {
-                    it.map { it::class.java }.distinct().size == classes.size
+                    Log.v("FlowFlow", it.size.toString())
+                    Log.v("FlowFlow", Arrays.toString(it.toTypedArray()))
+                    val d = it.map { it::class.java }.distinct()
+                    Log.v("FlowFlow", d.size.toString())
+                    Log.v("FlowFlow", Arrays.toString(d.toTypedArray()))
+                    d.size == classes.size
                 }
                 .map {
                     ArrayList<Event>().apply {
