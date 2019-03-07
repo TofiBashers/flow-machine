@@ -22,33 +22,30 @@ abstract class Flow<S : Flow.State>(val state: S) {
     protected inline fun <reified E1 : Event, reified E2 : Event> subscribeOnSeriesOfEvents(
         crossinline onSeriesOfEvents: (E1, E2) -> Unit
     ) = internalSubscribeOnSeriesOfEvents(
-        { onSeriesOfEvents(it[0] as E1, it[1] as E2) },
         E1::class.java,
         E2::class.java
-    )
+    ) { onSeriesOfEvents(it[0] as E1, it[1] as E2) }
 
     protected inline fun <reified E1 : Event, reified E2 : Event, reified E3 : Event> subscribeOnSeriesOfEvents(
         crossinline onSeriesOfEvents: (E1, E2, E3) -> Unit
     ) = internalSubscribeOnSeriesOfEvents(
-        { onSeriesOfEvents(it[0] as E1, it[1] as E2, it[2] as E3) },
         E1::class.java,
         E2::class.java,
         E3::class.java
-    )
+    ) { onSeriesOfEvents(it[0] as E1, it[1] as E2, it[2] as E3) }
 
     protected inline fun <reified E1 : Event, reified E2 : Event, reified E3 : Event, reified E4 : Event> subscribeOnSeriesOfEvents(
         crossinline onSeriesOfEvents: (E1, E2, E3, E4) -> Unit
     ) = internalSubscribeOnSeriesOfEvents(
-        { onSeriesOfEvents(it[0] as E1, it[1] as E2, it[2] as E3, it[3] as E4) },
         E1::class.java,
         E2::class.java,
         E3::class.java,
         E4::class.java
-    )
+    ) { onSeriesOfEvents(it[0] as E1, it[1] as E2, it[2] as E3, it[3] as E4) }
 
     protected fun internalSubscribeOnSeriesOfEvents(
-        onSeriesOfEvents: (events: List<Event>) -> Unit,
-        vararg classes: Class<*>
+        vararg classes: Class<*>,
+        onSeriesOfEvents: (events: List<Event>) -> Unit
     ) = javaClass.canonicalName?.let { thisName ->
         EVENT_SUBJECTS[thisName]?.let { eventSubject ->
             DISPOSABLES[thisName]?.addAll(
@@ -69,7 +66,6 @@ abstract class Flow<S : Flow.State>(val state: S) {
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(Schedulers.newThread())
                     .subscribe({ onSeriesOfEvents(it) }) { throw  it }
-
             )
         }
     }
