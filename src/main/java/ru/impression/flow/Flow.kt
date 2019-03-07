@@ -57,7 +57,7 @@ abstract class Flow<S : Flow.State>(val state: S) {
                     }
                     .map {
                         ArrayList<Event>().apply {
-                            for (i in 0..classes.size) {
+                            for (i in 0 until classes.size) {
                                 this[i] = it.find { it::class.java == classes[i] }!!
                             }
                         }
