@@ -22,23 +22,17 @@ abstract class Flow<S : Flow.State>(val state: S) {
     ) =
         javaClass.canonicalName?.let { thisName ->
             EVENT_SUBJECTS[thisName]?.let { eventSubject ->
-                DISPOSABLES[thisName]?.addAll(eventSubject
-                    .publish { source ->
-                        source
-                            .buffer(1)
-                            .filter { it is E1 }
-                    }
-                    .publish { source ->
-                        source
-                            .buffer(1)
-                            .filter { it is E2 }
-                    }
-                    .map {
-                        arrayListOf(it[0][0], it[1][0])
-                    }
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(Schedulers.newThread())
-                    .subscribe({ onEvent(it[0] as E1, it[1] as E2) }) { throw  it }
+                DISPOSABLES[thisName]?.addAll(
+                    eventSubject
+                        .filter { it is E1 || it is E2 }
+                        .buffer(2)
+                        .filter {
+                            it.distinct()
+                            it.size == 2
+                        }
+                        .subscribeOn(Schedulers.newThread())
+                        .observeOn(Schedulers.newThread())
+                        .subscribe({ onEvent(it[0] as E1, it[1] as E2) }) { throw  it }
 
                 )
             }
