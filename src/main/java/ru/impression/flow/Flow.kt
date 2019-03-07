@@ -49,31 +49,21 @@ abstract class Flow<S : Flow.State>(val state: S) {
     ) = javaClass.canonicalName?.let { thisName ->
         EVENT_SUBJECTS[thisName]?.let { eventSubject ->
             eventSubject
-                .filter {
-                    Log.v("FlowFlow", it.toString())
-                    classes.contains(it::class.java)
-                }
+                .filter { classes.contains(it::class.java) }
                 .buffer(classes.size)
-                .map {
-                    Log.v("FlowFlow", it.size.toString())
-                    Log.v("FlowFlow", Arrays.toString(it.toTypedArray()))
-                    it.distinctBy { it::class.java }
-                }
-                .filter {
-                    Log.v("FlowFlow", it.size.toString())
-                    Log.v("FlowFlow", Arrays.toString(it.toTypedArray()))
-                    it.size == classes.size
-                }
-                .map {
-                    ArrayList<Event>().apply {
-                        for (i in 0 until classes.size) {
-                            this.add(i, it.find { it::class.java == classes[i] }!!)
-                        }
-                    }
-                }
+                .map { it.distinctBy { it::class.java } }
                 .subscribeOn(Schedulers.newThread())
                 .observeOn(Schedulers.newThread())
-                .subscribe({ onSeriesOfEvents(it) }) { throw  it }
+                .subscribe({
+                    if (it.size == classes.size) {
+                        with(ArrayList<Event>()) {
+                            for (i in 0 until classes.size) {
+                                add(i, it.find { it::class.java == classes[i] }!!)
+                            }
+                            onSeriesOfEvents(this)
+                        }
+                    }
+                }) { throw  it }
                 .let { DISPOSABLES[thisName]?.addAll(it) }
         }
     }
