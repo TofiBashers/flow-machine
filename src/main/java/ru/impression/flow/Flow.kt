@@ -30,9 +30,11 @@ abstract class Flow<S : Flow.State>(val state: S) {
                     }
                     .publish { source ->
                         source
-                            .map { it[0] }
                             .buffer(1)
                             .filter { it is E2 }
+                    }
+                    .map {
+                        arrayListOf(it[0][0], it[1][0])
                     }
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(Schedulers.newThread())
