@@ -53,7 +53,8 @@ abstract class Flow<S : Flow.State>(val state: S) {
                     .filter { classes.contains(it::class.java) }
                     .buffer(classes.size)
                     .filter {
-                        it.distinct().size == classes.size
+                        val t = it.distinct()
+                        t.size == classes.size
                     }
                     .map {
                         ArrayList<Event>().apply {
