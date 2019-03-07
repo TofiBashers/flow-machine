@@ -11,12 +11,14 @@ interface FlowPerformer<F : Flow<*>> {
     fun attachToFlow() = flow.canonicalName?.let { flowName ->
         javaClass.canonicalName?.let { thisName ->
             DISPOSABLES[thisName] = CompositeDisposable().apply {
-                addAll(
-                    ACTION_SUBJECTS[flowName]
-                        ?.subscribeOn(Schedulers.newThread())
-                        ?.observeOn(AndroidSchedulers.mainThread())
-                        ?.subscribe({ performAction(it) }) { throw it }
-                )
+                ACTION_SUBJECTS[flowName]?.let { actionSubject ->
+                    addAll(
+                        actionSubject
+                            .subscribeOn(Schedulers.newThread())
+                            .observeOn(AndroidSchedulers.mainThread())
+                            .subscribe({ performAction(it) }) { throw it }
+                    )
+                }
             }
         }
     }

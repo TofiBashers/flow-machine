@@ -13,9 +13,7 @@ abstract class Flow<S : Flow.State>(val state: S) {
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(Schedulers.newThread())
                     .subscribe({ event -> if (event is E) onEvent(event) }) { throw  it }
-                    .let { disposable ->
-                        DISPOSABLES[thisName]?.addAll(disposable)
-                    }
+                    .let { disposable -> DISPOSABLES[thisName]?.addAll(disposable) }
             }
         }
 
@@ -48,24 +46,21 @@ abstract class Flow<S : Flow.State>(val state: S) {
         onSeriesOfEvents: (events: List<Event>) -> Unit
     ) = javaClass.canonicalName?.let { thisName ->
         EVENT_SUBJECTS[thisName]?.let { eventSubject ->
-            DISPOSABLES[thisName]?.addAll(
-                eventSubject
-                    .filter { classes.contains(it::class.java) }
-                    .buffer(classes.size)
-                    .filter {
-                        it.map { it::class.java }.distinct().size == classes.size
-                    }
-                    .map {
-                        ArrayList<Event>().apply {
-                            for (i in 0 until classes.size) {
-                                this[i] = it.find { it::class.java == classes[i] }!!
-                            }
+            eventSubject
+                .filter { classes.contains(it::class.java) }
+                .buffer(classes.size)
+                .filter { it.map { it::class.java }.distinct().size == classes.size }
+                .map {
+                    ArrayList<Event>().apply {
+                        for (i in 0 until classes.size) {
+                            this[i] = it.find { it::class.java == classes[i] }!!
                         }
                     }
-                    .subscribeOn(Schedulers.newThread())
-                    .observeOn(Schedulers.newThread())
-                    .subscribe({ onSeriesOfEvents(it) }) { throw  it }
-            )
+                }
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(Schedulers.newThread())
+                .subscribe({ onSeriesOfEvents(it) }) { throw  it }
+                .let { DISPOSABLES[thisName]?.addAll(it) }
         }
     }
 
