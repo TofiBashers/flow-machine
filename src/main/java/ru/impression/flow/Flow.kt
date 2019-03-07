@@ -49,7 +49,10 @@ abstract class Flow<S : Flow.State>(val state: S) {
     ) = javaClass.canonicalName?.let { thisName ->
         EVENT_SUBJECTS[thisName]?.let { eventSubject ->
             eventSubject
-                .filter { classes.contains(it::class.java) }
+                .filter {
+                    Log.v("FlowFlow", it.toString())
+                    classes.contains(it::class.java)
+                }
                 .buffer(classes.size)
                 .map {
                     Log.v("FlowFlow", it.size.toString())
