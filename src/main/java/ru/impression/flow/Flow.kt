@@ -1,8 +1,8 @@
 package ru.impression.flow
 
-import android.util.Log
+import io.reactivex.Observable
+import io.reactivex.functions.BiFunction
 import io.reactivex.schedulers.Schedulers
-import java.util.*
 
 abstract class Flow<S : Flow.State>(val state: S) {
 
@@ -21,50 +21,21 @@ abstract class Flow<S : Flow.State>(val state: S) {
 
     protected inline fun <reified E1 : Event, reified E2 : Event> subscribeOnSeriesOfEvents(
         crossinline onSeriesOfEvents: (E1, E2) -> Unit
-    ) = internalSubscribeOnSeriesOfEvents(
-        E1::class.java,
-        E2::class.java
-    ) { onSeriesOfEvents(it[0] as E1, it[1] as E2) }
-
-    protected inline fun <reified E1 : Event, reified E2 : Event, reified E3 : Event> subscribeOnSeriesOfEvents(
-        crossinline onSeriesOfEvents: (E1, E2, E3) -> Unit
-    ) = internalSubscribeOnSeriesOfEvents(
-        E1::class.java,
-        E2::class.java,
-        E3::class.java
-    ) { onSeriesOfEvents(it[0] as E1, it[1] as E2, it[2] as E3) }
-
-    protected inline fun <reified E1 : Event, reified E2 : Event, reified E3 : Event, reified E4 : Event> subscribeOnSeriesOfEvents(
-        crossinline onSeriesOfEvents: (E1, E2, E3, E4) -> Unit
-    ) = internalSubscribeOnSeriesOfEvents(
-        E1::class.java,
-        E2::class.java,
-        E3::class.java,
-        E4::class.java
-    ) { onSeriesOfEvents(it[0] as E1, it[1] as E2, it[2] as E3, it[3] as E4) }
-
-    protected fun internalSubscribeOnSeriesOfEvents(
-        vararg classes: Class<*>,
-        onSeriesOfEvents: (events: List<Event>) -> Unit
     ) = javaClass.canonicalName?.let { thisName ->
         EVENT_SUBJECTS[thisName]?.let { eventSubject ->
-            eventSubject
-                .filter { classes.contains(it::class.java) }
-                .buffer(classes.size)
-                .map { it.distinctBy { it::class.java } }
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(Schedulers.newThread())
-                .subscribe({
-                    if (it.size == classes.size) {
-                        with(ArrayList<Event>()) {
-                            for (i in 0 until classes.size) {
-                                add(i, it.find { it::class.java == classes[i] }!!)
-                            }
-                            onSeriesOfEvents(this)
-                        }
-                    }
-                }) { throw  it }
-                .let { DISPOSABLES[thisName]?.addAll(it) }
+            Observable
+                .zip(
+                    eventSubject
+                        .filter { it is E1 }
+                        .map { it as E1 },
+                    eventSubject
+                        .filter { it is E2 }
+                        .map { it as E2 },
+                    BiFunction<E1, E2, Unit> { e1, e2 -> onSeriesOfEvents(e1, e2) }
+                )
+                .doOnError { throw it }
+                .subscribe()
+                .let { disposable -> DISPOSABLES[thisName]?.addAll(disposable) }
         }
     }
 
