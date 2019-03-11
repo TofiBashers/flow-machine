@@ -33,6 +33,8 @@ abstract class Flow<S : Flow.State>(val state: S) {
                         .map { it as E2 },
                     BiFunction<E1, E2, Unit> { e1, e2 -> onSeriesOfEvents(e1, e2) }
                 )
+                .subscribeOn(Schedulers.newThread())
+                .observeOn(Schedulers.newThread())
                 .doOnError { throw it }
                 .subscribe()
                 .let { disposable -> DISPOSABLES[thisName]?.addAll(disposable) }
