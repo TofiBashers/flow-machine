@@ -8,16 +8,18 @@ interface FlowPerformer<F : Flow<*>> {
 
     val flow: Class<F>
 
-    fun attachToFlow() = flow.canonicalName?.let { flowName ->
-        javaClass.canonicalName?.let { thisName ->
-            DISPOSABLES[thisName] = CompositeDisposable().apply {
-                ACTION_SUBJECTS[flowName]?.let { actionSubject ->
-                    addAll(
-                        actionSubject
-                            .subscribeOn(Schedulers.newThread())
-                            .observeOn(AndroidSchedulers.mainThread())
-                            .subscribe({ performAction(it) }) { throw it }
-                    )
+    fun attachToFlow() {
+        flow.canonicalName?.let { flowName ->
+            javaClass.canonicalName?.let { thisName ->
+                DISPOSABLES[thisName] = CompositeDisposable().apply {
+                    ACTION_SUBJECTS[flowName]?.let { actionSubject ->
+                        addAll(
+                            actionSubject
+                                .subscribeOn(Schedulers.newThread())
+                                .observeOn(AndroidSchedulers.mainThread())
+                                .subscribe({ performAction(it) }) { throw it }
+                        )
+                    }
                 }
             }
         }
@@ -25,12 +27,16 @@ interface FlowPerformer<F : Flow<*>> {
 
     fun performAction(action: Flow.Action)
 
-    fun onEvent(event: Flow.Event) = flow.canonicalName?.let { flowName ->
-        EVENT_SUBJECTS[flowName]?.onNext(event)
+    fun onEvent(event: Flow.Event) {
+        flow.canonicalName?.let { flowName ->
+            EVENT_SUBJECTS[flowName]?.onNext(event)
+        }
     }
 
-    fun detachFromFlow() = javaClass.canonicalName?.let { thisName ->
-        DISPOSABLES[thisName]?.dispose()
-        DISPOSABLES.remove(thisName)
+    fun detachFromFlow() {
+        javaClass.canonicalName?.let { thisName ->
+            DISPOSABLES[thisName]?.dispose()
+            DISPOSABLES.remove(thisName)
+        }
     }
 }

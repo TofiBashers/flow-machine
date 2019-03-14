@@ -96,8 +96,10 @@ abstract class Flow<S>(val state: S) {
         }
     }
 
-    protected fun performAction(action: Action) = javaClass.canonicalName?.let { thisName ->
-        ACTION_SUBJECTS[thisName]?.onNext(action)
+    protected fun performAction(action: Action) {
+        javaClass.canonicalName?.let { thisName ->
+            ACTION_SUBJECTS[thisName]?.onNext(action)
+        }
     }
 
     abstract class Event
