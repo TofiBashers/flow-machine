@@ -6,7 +6,7 @@ import io.reactivex.functions.Function3
 import io.reactivex.functions.Function4
 import io.reactivex.schedulers.Schedulers
 
-abstract class Flow<S : Flow.State>(val state: S) {
+abstract class Flow<S>(val state: S) {
 
     abstract fun start()
 
@@ -101,8 +101,6 @@ abstract class Flow<S : Flow.State>(val state: S) {
     }
 
     abstract class Event
-
-    abstract class State
 
     abstract class Action
 }
