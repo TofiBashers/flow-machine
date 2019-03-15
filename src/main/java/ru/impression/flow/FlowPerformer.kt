@@ -31,7 +31,7 @@ interface FlowPerformer<F : Flow<*>> {
         }
     }
 
-    fun <E : Flow.Event> collectEventData(event: E) = Unit
+    fun collectEventData(event: Flow.Event) = Unit
 
     fun performAction(action: Flow.Action)
 
