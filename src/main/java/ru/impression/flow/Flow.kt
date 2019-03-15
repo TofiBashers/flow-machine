@@ -10,7 +10,7 @@ abstract class Flow<S>(val state: S) {
 
     abstract fun start()
 
-    protected inline fun <reified E : Event> subscribeOnEvent(crossinline onEvent: (E) -> Unit) =
+    protected inline fun <reified E : Event> subscribeOnEvent(crossinline onEvent: (E) -> Unit) {
         javaClass.canonicalName?.let { thisName ->
             EVENT_SUBJECTS[thisName]?.let { eventSubject ->
                 eventSubject
@@ -20,79 +20,86 @@ abstract class Flow<S>(val state: S) {
                     .let { disposable -> DISPOSABLES[thisName]?.addAll(disposable) }
             }
         }
+    }
 
     protected inline fun <reified E1 : Event, reified E2 : Event> subscribeOnSeriesOfEvents(
         crossinline onSeriesOfEvents: (E1, E2) -> Unit
-    ) = javaClass.canonicalName?.let { thisName ->
-        EVENT_SUBJECTS[thisName]?.let { eventSubject ->
-            Observable
-                .zip(
-                    eventSubject
-                        .filter { it is E1 }
-                        .map { it as E1 },
-                    eventSubject
-                        .filter { it is E2 }
-                        .map { it as E2 },
-                    BiFunction<E1, E2, Unit> { e1, e2 -> onSeriesOfEvents(e1, e2) }
-                )
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(Schedulers.newThread())
-                .doOnError { throw it }
-                .subscribe()
-                .let { disposable -> DISPOSABLES[thisName]?.addAll(disposable) }
+    ) {
+        javaClass.canonicalName?.let { thisName ->
+            EVENT_SUBJECTS[thisName]?.let { eventSubject ->
+                Observable
+                    .zip(
+                        eventSubject
+                            .filter { it is E1 }
+                            .map { it as E1 },
+                        eventSubject
+                            .filter { it is E2 }
+                            .map { it as E2 },
+                        BiFunction<E1, E2, Unit> { e1, e2 -> onSeriesOfEvents(e1, e2) }
+                    )
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(Schedulers.newThread())
+                    .doOnError { throw it }
+                    .subscribe()
+                    .let { disposable -> DISPOSABLES[thisName]?.addAll(disposable) }
+            }
         }
     }
 
     protected inline fun <reified E1 : Event, reified E2 : Event, reified E3 : Event> subscribeOnSeriesOfEvents(
         crossinline onSeriesOfEvents: (E1, E2, E3) -> Unit
-    ) = javaClass.canonicalName?.let { thisName ->
-        EVENT_SUBJECTS[thisName]?.let { eventSubject ->
-            Observable
-                .zip(
-                    eventSubject
-                        .filter { it is E1 }
-                        .map { it as E1 },
-                    eventSubject
-                        .filter { it is E2 }
-                        .map { it as E2 },
-                    eventSubject
-                        .filter { it is E3 }
-                        .map { it as E3 },
-                    Function3<E1, E2, E3, Unit> { e1, e2, e3 -> onSeriesOfEvents(e1, e2, e3) }
-                )
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(Schedulers.newThread())
-                .doOnError { throw it }
-                .subscribe()
-                .let { disposable -> DISPOSABLES[thisName]?.addAll(disposable) }
+    ) {
+        javaClass.canonicalName?.let { thisName ->
+            EVENT_SUBJECTS[thisName]?.let { eventSubject ->
+                Observable
+                    .zip(
+                        eventSubject
+                            .filter { it is E1 }
+                            .map { it as E1 },
+                        eventSubject
+                            .filter { it is E2 }
+                            .map { it as E2 },
+                        eventSubject
+                            .filter { it is E3 }
+                            .map { it as E3 },
+                        Function3<E1, E2, E3, Unit> { e1, e2, e3 -> onSeriesOfEvents(e1, e2, e3) }
+                    )
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(Schedulers.newThread())
+                    .doOnError { throw it }
+                    .subscribe()
+                    .let { disposable -> DISPOSABLES[thisName]?.addAll(disposable) }
+            }
         }
     }
 
     protected inline fun <reified E1 : Event, reified E2 : Event, reified E3 : Event, reified E4 : Event> subscribeOnSeriesOfEvents(
         crossinline onSeriesOfEvents: (E1, E2, E3, E4) -> Unit
-    ) = javaClass.canonicalName?.let { thisName ->
-        EVENT_SUBJECTS[thisName]?.let { eventSubject ->
-            Observable
-                .zip(
-                    eventSubject
-                        .filter { it is E1 }
-                        .map { it as E1 },
-                    eventSubject
-                        .filter { it is E2 }
-                        .map { it as E2 },
-                    eventSubject
-                        .filter { it is E3 }
-                        .map { it as E3 },
-                    eventSubject
-                        .filter { it is E4 }
-                        .map { it as E4 },
-                    Function4<E1, E2, E3, E4, Unit> { e1, e2, e3, e4 -> onSeriesOfEvents(e1, e2, e3, e4) }
-                )
-                .subscribeOn(Schedulers.newThread())
-                .observeOn(Schedulers.newThread())
-                .doOnError { throw it }
-                .subscribe()
-                .let { disposable -> DISPOSABLES[thisName]?.addAll(disposable) }
+    ) {
+        javaClass.canonicalName?.let { thisName ->
+            EVENT_SUBJECTS[thisName]?.let { eventSubject ->
+                Observable
+                    .zip(
+                        eventSubject
+                            .filter { it is E1 }
+                            .map { it as E1 },
+                        eventSubject
+                            .filter { it is E2 }
+                            .map { it as E2 },
+                        eventSubject
+                            .filter { it is E3 }
+                            .map { it as E3 },
+                        eventSubject
+                            .filter { it is E4 }
+                            .map { it as E4 },
+                        Function4<E1, E2, E3, E4, Unit> { e1, e2, e3, e4 -> onSeriesOfEvents(e1, e2, e3, e4) }
+                    )
+                    .subscribeOn(Schedulers.newThread())
+                    .observeOn(Schedulers.newThread())
+                    .doOnError { throw it }
+                    .subscribe()
+                    .let { disposable -> DISPOSABLES[thisName]?.addAll(disposable) }
+            }
         }
     }
 
