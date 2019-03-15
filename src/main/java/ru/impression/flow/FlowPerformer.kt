@@ -6,10 +6,10 @@ import io.reactivex.schedulers.Schedulers
 
 interface FlowPerformer<F : Flow<*>> {
 
-    val flow: Class<F>
+    val flowClass: Class<F>
 
     fun attachToFlow() {
-        flow.canonicalName?.let { flowName ->
+        flowClass.canonicalName?.let { flowName ->
             javaClass.canonicalName?.let { thisName ->
                 DISPOSABLES[thisName] = CompositeDisposable().apply {
                     ACTION_SUBJECTS[flowName]?.let { actionSubject ->
@@ -28,7 +28,7 @@ interface FlowPerformer<F : Flow<*>> {
     fun performAction(action: Flow.Action)
 
     fun onEvent(event: Flow.Event) {
-        flow.canonicalName?.let { flowName ->
+        flowClass.canonicalName?.let { flowName ->
             EVENT_SUBJECTS[flowName]?.onNext(event)
         }
     }

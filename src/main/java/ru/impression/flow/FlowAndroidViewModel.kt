@@ -7,33 +7,33 @@ import android.arch.lifecycle.ViewModelProvider
 
 abstract class FlowAndroidViewModel<F : Flow<*>>(
     application: Application,
-    final override val flow: Class<F>
-) : AndroidViewModel(application), FlowPerformer<F> {
+    final override val flowClass: Class<F>
+) : AndroidViewModel(application), FlowManager<F>, FlowPerformer<F> {
 
-    final override fun attachToFlow() {
-        super.attachToFlow()
-    }
+    final override fun startFlow() = super.startFlow()
+
+    final override fun attachToFlow() = super.attachToFlow()
 
     init {
-        FlowManager.startFlow(flow)
+        startFlow()
         attachToFlow()
     }
 
     override fun onCleared() {
         detachFromFlow()
-        FlowManager.finishFlow(flow)
+        finishFlow()
         super.onCleared()
     }
 }
 
 class FlowAndroidViewModelFactory<F : Flow<*>>(
     private val application: Application,
-    private val flow: Class<F>
+    private val flowClass: Class<F>
 ) : ViewModelProvider.AndroidViewModelFactory(application) {
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T =
         if (modelClass.isAssignableFrom(FlowViewModel::class.java))
-            modelClass.getConstructor(application::class.java, flow::class.java).newInstance(application, flow)
+            modelClass.getConstructor(application::class.java, flowClass::class.java).newInstance(application, flowClass)
         else
             super.create(modelClass)
 }

@@ -2,13 +2,14 @@ package ru.impression.flow
 
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
-import io.reactivex.subjects.ReplaySubject
 
-object FlowManager {
+interface FlowManager<F : Flow<*>> {
 
-    fun <F : Flow<*>> startFlow(flow: Class<F>) {
-        flow.canonicalName?.let { flowName ->
-            val flowInstance = flow.newInstance()
+    val flowClass: Class<F>
+
+    fun startFlow() {
+        flowClass.canonicalName?.let { flowName ->
+            val flowInstance = flowClass.newInstance()
             DISPOSABLES[flowName] = CompositeDisposable()
             EVENT_SUBJECTS[flowName] = BehaviorSubject.create()
             ACTION_SUBJECTS[flowName] = BehaviorSubject.create()
@@ -16,8 +17,8 @@ object FlowManager {
         }
     }
 
-    fun <F : Flow<*>> finishFlow(flow: Class<F>) {
-        flow.canonicalName?.let { flowName ->
+    fun finishFlow() {
+        flowClass.canonicalName?.let { flowName ->
             DISPOSABLES[flowName]?.dispose()
             DISPOSABLES.remove(flowName)
             EVENT_SUBJECTS.remove(flowName)

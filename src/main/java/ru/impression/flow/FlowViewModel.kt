@@ -3,29 +3,31 @@ package ru.impression.flow
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 
-abstract class FlowViewModel<F : Flow<*>>(final override val flow: Class<F>) : ViewModel(), FlowPerformer<F> {
+abstract class FlowViewModel<F : Flow<*>>(
+    final override val flowClass: Class<F>
+) : ViewModel(), FlowManager<F>, FlowPerformer<F> {
 
-    final override fun attachToFlow() {
-        super.attachToFlow()
-    }
+    final override fun startFlow() = super.startFlow()
+
+    final override fun attachToFlow() = super.attachToFlow()
 
     init {
-        FlowManager.startFlow(flow)
+        startFlow()
         attachToFlow()
     }
 
     override fun onCleared() {
         detachFromFlow()
-        FlowManager.finishFlow(flow)
+        finishFlow()
         super.onCleared()
     }
 }
 
-class FlowViewModelFactory<F : Flow<*>>(private val flow: Class<F>) : ViewModelProvider.NewInstanceFactory() {
+class FlowViewModelFactory<F : Flow<*>>(private val flowClass: Class<F>) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T =
         if (modelClass.isAssignableFrom(FlowViewModel::class.java))
-            modelClass.getConstructor(flow::class.java).newInstance(flow)
+            modelClass.getConstructor(flowClass::class.java).newInstance(flowClass)
         else
             super.create(modelClass)
 }
