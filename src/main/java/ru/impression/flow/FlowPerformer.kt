@@ -31,7 +31,7 @@ interface FlowPerformer<F : Flow<*>> {
         }
     }
 
-    fun collectEventData(event: Flow.Event) = Unit
+    fun enrichEvent(event: Flow.Event) = Unit
 
     fun performAction(action: Flow.Action)
 

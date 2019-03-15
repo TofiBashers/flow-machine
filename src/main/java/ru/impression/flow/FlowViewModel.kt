@@ -4,14 +4,15 @@ import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
+import io.reactivex.subjects.BehaviorSubject
 
-fun <M : ViewModel> Class<M>.isAndroidViewModel() = isAssignableFrom(AndroidViewModel::class.java)
+internal fun <M : ViewModel> Class<M>.isAndroidViewModel() = isAssignableFrom(AndroidViewModel::class.java)
 
 abstract class FlowViewModel<F : Flow<*>>(
     final override val flowClass: Class<F>
 ) : ViewModel(), FlowManager<F>, FlowPerformer<F> {
 
-    internal lateinit var collectViewEventData: (event: Flow.Event) -> Unit
+    internal val viewEnrichEventSubject = BehaviorSubject.create<Flow.Event>()
 
     final override fun startFlow() = super.startFlow()
 
@@ -23,7 +24,7 @@ abstract class FlowViewModel<F : Flow<*>>(
     }
 
     override fun eventOccurred(event: Flow.Event) {
-        collectViewEventData.invoke(event)
+        viewEnrichEventSubject.onNext(event)
         super.eventOccurred(event)
     }
 
@@ -39,7 +40,7 @@ abstract class FlowAndroidViewModel<F : Flow<*>>(
     final override val flowClass: Class<F>
 ) : AndroidViewModel(application), FlowManager<F>, FlowPerformer<F> {
 
-    internal lateinit var collectViewEventData: (event: Flow.Event) -> Unit
+    internal val viewEnrichEventSubject = BehaviorSubject.create<Flow.Event>()
 
     final override fun startFlow() = super.startFlow()
 
@@ -51,7 +52,7 @@ abstract class FlowAndroidViewModel<F : Flow<*>>(
     }
 
     override fun eventOccurred(event: Flow.Event) {
-        collectViewEventData.invoke(event)
+        viewEnrichEventSubject.onNext(event)
         super.eventOccurred(event)
     }
 

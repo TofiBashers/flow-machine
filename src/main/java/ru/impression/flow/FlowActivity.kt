@@ -4,6 +4,8 @@ import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v7.app.AppCompatActivity
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 
 abstract class FlowActivity<F : Flow<*>, M : ViewModel>(
     final override val flowClass: Class<F>
@@ -26,16 +28,24 @@ abstract class FlowActivity<F : Flow<*>, M : ViewModel>(
                 FlowAndroidViewModelFactory(application, flowClass)
             else
                 FlowViewModelFactory(flowClass)
-        )[viewModelClass].apply {
-            if (viewModelClass.isAndroidViewModel())
-                (this as FlowAndroidViewModel<*>).collectViewEventData = { collectEventData(it) }
-            else
-                (this as FlowViewModel<*>).collectViewEventData = { collectEventData(it) }
-        }
+        )[viewModelClass]
+
+        (if (viewModelClass.isAndroidViewModel())
+            (viewModel as FlowAndroidViewModel<*>).viewEnrichEventSubject
+        else
+            (viewModel as FlowViewModel<*>).viewEnrichEventSubject)
+            .subscribeOn(Schedulers.newThread())
+            .observeOn(AndroidSchedulers.mainThread())
+            .subscribe({ enrichEvent(it) }) { throw it }
+            .let { disposable ->
+                javaClass.canonicalName?.let { thisName ->
+                    DISPOSABLES[thisName]?.addAll(disposable)
+                }
+            }
     }
 
     override fun eventOccurred(event: Flow.Event) {
-        (viewModel as FlowPerformer<*>).collectEventData(event)
+        (viewModel as FlowPerformer<*>).enrichEvent(event)
         super.eventOccurred(event)
     }
 
