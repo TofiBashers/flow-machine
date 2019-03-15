@@ -1,6 +1,5 @@
 package ru.impression.flow
 
-import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
@@ -23,12 +22,20 @@ abstract class FlowActivity<F : Flow<*>, M : ViewModel>(
     private fun initViewModel() {
         viewModel = ViewModelProviders.of(
             this,
-            if (viewModelClass.isAssignableFrom(AndroidViewModel::class.java))
+            if (viewModelClass.isAndroidViewModel())
                 FlowAndroidViewModelFactory(application, flowClass)
             else
                 FlowViewModelFactory(flowClass)
-        )[viewModelClass]
+        )[viewModelClass].apply {
+            if (viewModelClass.isAndroidViewModel())
+                (this as FlowAndroidViewModel<*>).collectViewEventData = { collectEventData(it) }
+            else
+                (this as FlowViewModel<*>).collectViewEventData = { collectEventData(it) }
+        }
     }
+
+    override fun eventOccurred(event: Flow.Event) =
+        super.eventOccurred((viewModel as FlowPerformer<*>).collectEventData(event))
 
     override fun onDestroy() {
         detachFromFlow()

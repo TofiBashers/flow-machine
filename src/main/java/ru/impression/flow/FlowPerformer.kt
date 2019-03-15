@@ -25,13 +25,15 @@ interface FlowPerformer<F : Flow<*>> {
         }
     }
 
-    fun performAction(action: Flow.Action)
-
-    fun onEvent(event: Flow.Event) {
+    fun eventOccurred(event: Flow.Event) {
         flowClass.canonicalName?.let { flowName ->
             EVENT_SUBJECTS[flowName]?.onNext(event)
         }
     }
+
+    fun <E : Flow.Event> collectEventData(event: E) = event
+
+    fun performAction(action: Flow.Action)
 
     fun detachFromFlow() {
         javaClass.canonicalName?.let { thisName ->
