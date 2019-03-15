@@ -11,7 +11,7 @@ object FlowManager {
             val flowInstance = flow.newInstance()
             DISPOSABLES[flowName] = CompositeDisposable()
             EVENT_SUBJECTS[flowName] = BehaviorSubject.create()
-            ACTION_SUBJECTS[flowName] = ReplaySubject.createWithSize(1)
+            ACTION_SUBJECTS[flowName] = BehaviorSubject.create()
             flowInstance.start()
         }
     }
