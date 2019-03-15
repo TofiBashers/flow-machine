@@ -34,8 +34,10 @@ abstract class FlowActivity<F : Flow<*>, M : ViewModel>(
         }
     }
 
-    override fun eventOccurred(event: Flow.Event) =
-        super.eventOccurred((viewModel as FlowPerformer<*>).collectEventData(event))
+    override fun eventOccurred(event: Flow.Event) {
+        (viewModel as FlowPerformer<*>).collectEventData(event)
+        super.eventOccurred(event)
+    }
 
     override fun onDestroy() {
         detachFromFlow()

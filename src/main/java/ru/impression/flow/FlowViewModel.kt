@@ -11,7 +11,7 @@ abstract class FlowViewModel<F : Flow<*>>(
     final override val flowClass: Class<F>
 ) : ViewModel(), FlowManager<F>, FlowPerformer<F> {
 
-    internal lateinit var collectViewEventData: (event: Flow.Event) -> Flow.Event
+    internal lateinit var collectViewEventData: (event: Flow.Event) -> Unit
 
     final override fun startFlow() = super.startFlow()
 
@@ -22,7 +22,10 @@ abstract class FlowViewModel<F : Flow<*>>(
         attachToFlow()
     }
 
-    override fun eventOccurred(event: Flow.Event) = super.eventOccurred(collectViewEventData.invoke(event))
+    override fun eventOccurred(event: Flow.Event) {
+        collectViewEventData.invoke(event)
+        super.eventOccurred(event)
+    }
 
     override fun onCleared() {
         detachFromFlow()
@@ -36,7 +39,7 @@ abstract class FlowAndroidViewModel<F : Flow<*>>(
     final override val flowClass: Class<F>
 ) : AndroidViewModel(application), FlowManager<F>, FlowPerformer<F> {
 
-    internal lateinit var collectViewEventData: (event: Flow.Event) -> Flow.Event
+    internal lateinit var collectViewEventData: (event: Flow.Event) -> Unit
 
     final override fun startFlow() = super.startFlow()
 
@@ -47,7 +50,10 @@ abstract class FlowAndroidViewModel<F : Flow<*>>(
         attachToFlow()
     }
 
-    override fun eventOccurred(event: Flow.Event) = super.eventOccurred(collectViewEventData.invoke(event))
+    override fun eventOccurred(event: Flow.Event) {
+        collectViewEventData.invoke(event)
+        super.eventOccurred(event)
+    }
 
     override fun onCleared() {
         detachFromFlow()
