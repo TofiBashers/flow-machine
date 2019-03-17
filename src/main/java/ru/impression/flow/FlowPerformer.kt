@@ -33,7 +33,7 @@ interface FlowPerformer<F : Flow<*>> {
 
     fun enrichEvent(event: Flow.Event) = Unit
 
-    fun performAction(action: Flow.Action)
+    fun performAction(action: Flow.Action) = Unit
 
     fun detachFromFlow() {
         javaClass.canonicalName?.let { thisName ->
