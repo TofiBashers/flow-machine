@@ -8,10 +8,9 @@ import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
 
 abstract class FlowActivity<F : Flow<*>, M : ViewModel>(
-    final override val flowClass: Class<F>
+    final override val flowClass: Class<F>,
+    val viewModelClass: Class<M>
 ) : AppCompatActivity(), FlowPerformer<F> {
-
-    abstract val viewModelClass: Class<M>
 
     lateinit var viewModel: M
 
