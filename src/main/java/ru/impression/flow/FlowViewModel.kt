@@ -6,7 +6,7 @@ import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
 import io.reactivex.subjects.BehaviorSubject
 
-internal fun <M : ViewModel> Class<M>.isAndroidViewModel() = isAssignableFrom(AndroidViewModel::class.java)
+internal fun <M : ViewModel> Class<M>.isAndroidViewModel() = AndroidViewModel::class.java.isAssignableFrom(this)
 
 abstract class FlowViewModel<F : Flow<*>>(
     final override val flowClass: Class<F>
@@ -66,7 +66,7 @@ abstract class FlowAndroidViewModel<F : Flow<*>>(
 class FlowViewModelFactory<F : Flow<*>>(private val flowClass: Class<F>) : ViewModelProvider.NewInstanceFactory() {
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T =
-        if (modelClass.isAssignableFrom(FlowViewModel::class.java))
+        if (FlowViewModel::class.java.isAssignableFrom(modelClass))
             modelClass.getConstructor(flowClass::class.java).newInstance(flowClass)
         else
             super.create(modelClass)
@@ -78,7 +78,7 @@ class FlowAndroidViewModelFactory<F : Flow<*>>(
 ) : ViewModelProvider.AndroidViewModelFactory(application) {
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T =
-        if (modelClass.isAssignableFrom(FlowAndroidViewModel::class.java))
+        if (FlowAndroidViewModel::class.java.isAssignableFrom(modelClass))
             modelClass
                 .getConstructor(application::class.java, flowClass::class.java)
                 .newInstance(application, flowClass)
