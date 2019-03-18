@@ -11,10 +11,10 @@ import ru.impression.flow.DISPOSABLES
 import ru.impression.flow.Flow
 import ru.impression.flow.FlowPerformer
 
-abstract class FlowActivityWithViewModel<F : Flow<*>, M : ViewModel>(override val flowClass: Class<F>) :
-    AppCompatActivity(), FlowPerformer<F> {
-
-    abstract val viewModelClass: Class<M>
+abstract class FlowActivityWithViewModel<F : Flow<*>, M : ViewModel>(
+    override val flowClass: Class<F>,
+    val viewModelClass: Class<M>
+) : AppCompatActivity(), FlowPerformer<F> {
 
     lateinit var viewModel: M
 
