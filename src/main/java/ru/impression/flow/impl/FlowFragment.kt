@@ -8,13 +8,19 @@ import ru.impression.flow.FlowPerformer
 
 abstract class FlowFragment<F : Flow<*>>(final override val flowClass: Class<F>) : Fragment(), FlowPerformer<F> {
 
+    private var attachedToFlow = false
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        attachToFlow()
+        if (!attachedToFlow) {
+            attachToFlow()
+            attachedToFlow = true
+        }
     }
 
-    override fun onDestroyView() {
+    override fun onDestroy() {
         detachFromFlow()
-        super.onDestroyView()
+        attachedToFlow = false
+        super.onDestroy()
     }
 }

@@ -5,7 +5,7 @@ import android.support.v7.app.AppCompatActivity
 import ru.impression.flow.Flow
 import ru.impression.flow.FlowPerformer
 
-abstract class FlowActivity<F : Flow<*>> : AppCompatActivity(), FlowPerformer<F> {
+abstract class FlowActivity<F : Flow<*>>(override val flowClass: Class<F>) : AppCompatActivity(), FlowPerformer<F> {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
