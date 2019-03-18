@@ -19,15 +19,10 @@ abstract class FlowFragmentWithViewModel<F : Flow<*>, M : ViewModel>(
 
     lateinit var viewModel: M
 
-    private var attachedToFlow = false
-
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         initViewModel()
-        if (!attachedToFlow) {
-            attachToFlow()
-            attachedToFlow = true
-        }
+        attachToFlow()
     }
 
     private fun initViewModel() {
@@ -54,9 +49,8 @@ abstract class FlowFragmentWithViewModel<F : Flow<*>, M : ViewModel>(
         super.eventOccurred(event)
     }
 
-    override fun onDestroy() {
+    override fun onDestroyView() {
         detachFromFlow()
-        attachedToFlow = false
-        super.onDestroy()
+        super.onDestroyView()
     }
 }
