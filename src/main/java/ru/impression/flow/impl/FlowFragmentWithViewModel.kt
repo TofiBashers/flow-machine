@@ -1,5 +1,6 @@
-package ru.impression.flow
+package ru.impression.flow.impl
 
+import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
@@ -7,8 +8,11 @@ import android.support.v4.app.Fragment
 import android.view.View
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
+import ru.impression.flow.DISPOSABLES
+import ru.impression.flow.Flow
+import ru.impression.flow.FlowPerformer
 
-abstract class FlowFragment<F : Flow<*>, M : ViewModel>(
+abstract class FlowFragmentWithViewModel<F : Flow<*>, M : ViewModel>(
     final override val flowClass: Class<F>,
     val viewModelClass: Class<M>
 ) : Fragment(), FlowPerformer<F> {
@@ -24,13 +28,9 @@ abstract class FlowFragment<F : Flow<*>, M : ViewModel>(
     private fun initViewModel() {
         viewModel = ViewModelProviders.of(
             this,
-            if (viewModelClass.isAndroidViewModel())
-                FlowAndroidViewModelFactory(activity!!.application, flowClass)
-            else
-                FlowViewModelFactory(flowClass)
+            FlowViewModelFactory(activity!!.application, flowClass)
         )[viewModelClass]
-
-        (if (viewModelClass.isAndroidViewModel())
+        (if (AndroidViewModel::class.java.isAssignableFrom(viewModelClass))
             (viewModel as FlowAndroidViewModel<*>).viewEnrichEventSubject
         else
             (viewModel as FlowViewModel<*>).viewEnrichEventSubject)

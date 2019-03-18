@@ -17,7 +17,7 @@ interface FlowManager<F : Flow<*>> {
         }
     }
 
-    fun finishFlow() {
+    fun stopFlow() {
         flowClass.canonicalName?.let { flowName ->
             DISPOSABLES[flowName]?.dispose()
             DISPOSABLES.remove(flowName)
