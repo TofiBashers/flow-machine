@@ -9,6 +9,7 @@ interface FlowManager<F : Flow<*>> {
 
     fun startFlow() {
         flowClass.canonicalName?.let { flowName ->
+            DISPOSABLES[flowName]?.let { return }
             val flowInstance = flowClass.newInstance()
             DISPOSABLES[flowName] = CompositeDisposable()
             EVENT_SUBJECTS[flowName] = BehaviorSubject.create()
