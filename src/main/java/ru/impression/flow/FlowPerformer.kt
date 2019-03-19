@@ -13,7 +13,7 @@ interface FlowPerformer<F : Flow<*>> {
             javaClass.canonicalName?.let { thisName ->
                 DISPOSABLES[thisName] = CompositeDisposable().apply {
                     ACTION_SUBJECTS[flowName]?.let { actionSubject ->
-                        addAll(
+                        add(
                             actionSubject
                                 .subscribeOn(Schedulers.newThread())
                                 .observeOn(AndroidSchedulers.mainThread())

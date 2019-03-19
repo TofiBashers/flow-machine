@@ -39,7 +39,7 @@ abstract class FlowFragmentWithViewModel<F : Flow<*>, M : ViewModel>(
             .subscribe({ enrichEvent(it) }) { throw it }
             .let { disposable ->
                 javaClass.canonicalName?.let { thisName ->
-                    DISPOSABLES[thisName]?.addAll(disposable)
+                    DISPOSABLES[thisName]?.add(disposable)
                 }
             }
     }
