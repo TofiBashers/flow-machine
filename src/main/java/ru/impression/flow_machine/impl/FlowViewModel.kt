@@ -5,11 +5,9 @@ import io.reactivex.subjects.BehaviorSubject
 import ru.impression.flow_machine.Flow
 import ru.impression.flow_machine.FlowPerformer
 
-abstract class FlowViewModel<F : Flow<*>>(
-    final override val flowClass: Class<F>
-) : ViewModel(), FlowPerformer<F> {
+abstract class FlowViewModel<F : Flow<*>>(final override val flowClass: Class<F>) : ViewModel(), FlowPerformer<F> {
 
-    internal val viewEnrichEventSubject = BehaviorSubject.create<Flow.Event>()
+    open val eventEnrichers: List<FlowPerformer<F>> = emptyList()
 
     final override fun attachToFlow() = super.attachToFlow()
 
@@ -18,7 +16,7 @@ abstract class FlowViewModel<F : Flow<*>>(
     }
 
     override fun eventOccurred(event: Flow.Event) {
-        viewEnrichEventSubject.onNext(event)
+        eventEnrichers.forEach { it.enrichEvent(event) }
         super.eventOccurred(event)
     }
 

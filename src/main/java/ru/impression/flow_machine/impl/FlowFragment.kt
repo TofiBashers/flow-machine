@@ -8,9 +8,16 @@ import ru.impression.flow_machine.FlowPerformer
 
 abstract class FlowFragment<F : Flow<*>>(override val flowClass: Class<F>) : Fragment(), FlowPerformer<F> {
 
+    open val eventEnrichers: List<FlowPerformer<F>> = emptyList()
+
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         attachToFlow()
+    }
+
+    override fun eventOccurred(event: Flow.Event) {
+        eventEnrichers.forEach { it.enrichEvent(event) }
+        super.eventOccurred(event)
     }
 
     override fun onDestroyView() {

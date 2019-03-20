@@ -9,10 +9,17 @@ import ru.impression.flow_machine.FlowPerformer
 abstract class FlowInitiatingActivity<F : Flow<*>>(override val flowClass: Class<F>) :
     AppCompatActivity(), FlowInitiator<F>, FlowPerformer<F> {
 
+    open val eventEnrichers: List<FlowPerformer<F>> = emptyList()
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         startFlow()
         attachToFlow()
+    }
+
+    override fun eventOccurred(event: Flow.Event) {
+        eventEnrichers.forEach { it.enrichEvent(event) }
+        super.eventOccurred(event)
     }
 
     override fun onDestroy() {

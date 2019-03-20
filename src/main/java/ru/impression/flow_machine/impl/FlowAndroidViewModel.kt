@@ -2,7 +2,10 @@ package ru.impression.flow_machine.impl
 
 import android.app.Application
 import android.arch.lifecycle.AndroidViewModel
+import io.reactivex.android.schedulers.AndroidSchedulers
+import io.reactivex.schedulers.Schedulers
 import io.reactivex.subjects.BehaviorSubject
+import ru.impression.flow_machine.DISPOSABLES
 import ru.impression.flow_machine.Flow
 import ru.impression.flow_machine.FlowPerformer
 
@@ -11,7 +14,7 @@ abstract class FlowAndroidViewModel<F : Flow<*>>(
     final override val flowClass: Class<F>
 ) : AndroidViewModel(application), FlowPerformer<F> {
 
-    internal val viewEnrichEventSubject = BehaviorSubject.create<Flow.Event>()
+    open val eventEnrichers: List<FlowPerformer<F>> = emptyList()
 
     final override fun attachToFlow() = super.attachToFlow()
 
@@ -20,7 +23,7 @@ abstract class FlowAndroidViewModel<F : Flow<*>>(
     }
 
     override fun eventOccurred(event: Flow.Event) {
-        viewEnrichEventSubject.onNext(event)
+        eventEnrichers.forEach { it.enrichEvent(event) }
         super.eventOccurred(event)
     }
 

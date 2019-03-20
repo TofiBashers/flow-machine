@@ -71,6 +71,6 @@ allprojects {
 2. Add the dependency:
 ```
 dependencies {
-    implementation 'com.github.ArtemiyDmtrvch:flow:1+'
+    implementation 'com.github.ArtemiyDmtrvch:flow:0+'
 }
 ```

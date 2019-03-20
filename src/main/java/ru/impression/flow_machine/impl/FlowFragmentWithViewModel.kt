@@ -13,45 +13,24 @@ import ru.impression.flow_machine.FlowPerformer
 
 abstract class FlowFragmentWithViewModel<F : Flow<*>, M : ViewModel>(
     override val flowClass: Class<F>,
-    val viewModelClass: Class<M>
+    private val viewModelClass: Class<M>
 ) : Fragment(), FlowPerformer<F> {
+
+    open val eventEnrichers: List<FlowPerformer<F>> = emptyList()
 
     lateinit var viewModel: M
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
-        initViewModel()
-        attachToFlow()
-    }
-
-    private fun initViewModel() {
         viewModel = ViewModelProviders.of(
             this,
             FlowViewModelFactory(activity!!.application, flowClass)
         )[viewModelClass]
-        when {
-            FlowViewModel::class.java.isAssignableFrom(viewModelClass) ->
-                (viewModel as FlowViewModel<*>).viewEnrichEventSubject
-            FlowAndroidViewModel::class.java.isAssignableFrom(viewModelClass) ->
-                (viewModel as FlowAndroidViewModel<*>).viewEnrichEventSubject
-            FlowInitiatingViewModel::class.java.isAssignableFrom(viewModelClass) ->
-                (viewModel as FlowInitiatingViewModel<*>).viewEnrichEventSubject
-            FlowInitiatingAndroidViewModel::class.java.isAssignableFrom(viewModelClass) ->
-                (viewModel as FlowInitiatingAndroidViewModel<*>).viewEnrichEventSubject
-            else -> null
-        }
-            ?.subscribeOn(Schedulers.newThread())
-            ?.observeOn(AndroidSchedulers.mainThread())
-            ?.subscribe({ enrichEvent(it) }) { throw it }
-            ?.let { disposable ->
-                javaClass.canonicalName?.let { thisName ->
-                    DISPOSABLES[thisName]?.add(disposable)
-                }
-            }
+        attachToFlow()
     }
 
     override fun eventOccurred(event: Flow.Event) {
-        if (viewModel is FlowPerformer<*>) (viewModel as FlowPerformer<*>).enrichEvent(event)
+        eventEnrichers.forEach { it.enrichEvent(event) }
         super.eventOccurred(event)
     }
 
