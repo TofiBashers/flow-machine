@@ -9,9 +9,11 @@ class FlowViewModelFactory<F : Flow<*>>(private val application: Application, pr
     ViewModelProvider.AndroidViewModelFactory(application) {
 
     override fun <T : ViewModel?> create(modelClass: Class<T>): T = when {
-        FlowViewModel::class.java.isAssignableFrom(modelClass) ->
+        FlowViewModel::class.java.isAssignableFrom(modelClass) ||
+                FlowInitiatingViewModel::class.java.isAssignableFrom(modelClass) ->
             modelClass.getConstructor(flowClass::class.java).newInstance(flowClass)
-        FlowAndroidViewModel::class.java.isAssignableFrom(modelClass) ->
+        FlowAndroidViewModel::class.java.isAssignableFrom(modelClass) ||
+                FlowInitiatingAndroidViewModel::class.java.isAssignableFrom(modelClass) ->
             modelClass
                 .getConstructor(application::class.java, flowClass::class.java)
                 .newInstance(application, flowClass)

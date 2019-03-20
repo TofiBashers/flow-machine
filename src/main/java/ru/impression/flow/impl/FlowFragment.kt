@@ -6,7 +6,7 @@ import android.view.View
 import ru.impression.flow.Flow
 import ru.impression.flow.FlowPerformer
 
-abstract class FlowFragment<F : Flow<*>>(final override val flowClass: Class<F>) : Fragment(), FlowPerformer<F> {
+abstract class FlowFragment<F : Flow<*>>(override val flowClass: Class<F>) : Fragment(), FlowPerformer<F> {
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)

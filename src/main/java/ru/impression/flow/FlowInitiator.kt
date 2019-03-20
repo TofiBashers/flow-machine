@@ -3,7 +3,7 @@ package ru.impression.flow
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
 
-interface FlowManager<F : Flow<*>> {
+interface FlowInitiator<F : Flow<*>> {
 
     val flowClass: Class<F>
 
@@ -18,7 +18,7 @@ interface FlowManager<F : Flow<*>> {
         }
     }
 
-    fun stopFlow() {
+    fun finishFlow() {
         flowClass.canonicalName?.let { flowName ->
             DISPOSABLES[flowName]?.dispose()
             DISPOSABLES.remove(flowName)

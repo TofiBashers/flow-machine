@@ -1,6 +1,5 @@
 package ru.impression.flow.impl
 
-import android.arch.lifecycle.AndroidViewModel
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
@@ -13,7 +12,7 @@ import ru.impression.flow.Flow
 import ru.impression.flow.FlowPerformer
 
 abstract class FlowFragmentWithViewModel<F : Flow<*>, M : ViewModel>(
-    final override val flowClass: Class<F>,
+    override val flowClass: Class<F>,
     val viewModelClass: Class<M>
 ) : Fragment(), FlowPerformer<F> {
 
@@ -30,14 +29,21 @@ abstract class FlowFragmentWithViewModel<F : Flow<*>, M : ViewModel>(
             this,
             FlowViewModelFactory(activity!!.application, flowClass)
         )[viewModelClass]
-        (if (AndroidViewModel::class.java.isAssignableFrom(viewModelClass))
-            (viewModel as FlowAndroidViewModel<*>).viewEnrichEventSubject
-        else
-            (viewModel as FlowViewModel<*>).viewEnrichEventSubject)
-            .subscribeOn(Schedulers.newThread())
-            .observeOn(AndroidSchedulers.mainThread())
-            .subscribe({ enrichEvent(it) }) { throw it }
-            .let { disposable ->
+        when {
+            FlowViewModel::class.java.isAssignableFrom(viewModelClass) ->
+                (viewModel as FlowViewModel<*>).viewEnrichEventSubject
+            FlowAndroidViewModel::class.java.isAssignableFrom(viewModelClass) ->
+                (viewModel as FlowAndroidViewModel<*>).viewEnrichEventSubject
+            FlowInitiatingViewModel::class.java.isAssignableFrom(viewModelClass) ->
+                (viewModel as FlowInitiatingViewModel<*>).viewEnrichEventSubject
+            FlowInitiatingAndroidViewModel::class.java.isAssignableFrom(viewModelClass) ->
+                (viewModel as FlowInitiatingAndroidViewModel<*>).viewEnrichEventSubject
+            else -> null
+        }
+            ?.subscribeOn(Schedulers.newThread())
+            ?.observeOn(AndroidSchedulers.mainThread())
+            ?.subscribe({ enrichEvent(it) }) { throw it }
+            ?.let { disposable ->
                 javaClass.canonicalName?.let { thisName ->
                     DISPOSABLES[thisName]?.add(disposable)
                 }
@@ -45,7 +51,7 @@ abstract class FlowFragmentWithViewModel<F : Flow<*>, M : ViewModel>(
     }
 
     override fun eventOccurred(event: Flow.Event) {
-        (viewModel as FlowPerformer<*>).enrichEvent(event)
+        if (viewModel is FlowPerformer<*>) (viewModel as FlowPerformer<*>).enrichEvent(event)
         super.eventOccurred(event)
     }
 
