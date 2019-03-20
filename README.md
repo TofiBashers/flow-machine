@@ -50,3 +50,21 @@ As a result:
 - you think much less when writing the business logic of your app, especially if you have an analytical flowchart
 - regardless of your experience, you can easily navigate the project of any complexity
 - you can make any changes to the logical components, replace them, and not worry about the consequences
+
+## Install it and let's move on
+
+1. Add the JitPack repository in your root build.gradle at the end of repositories:
+```
+allprojects {
+    repositories {
+        ...
+        maven { url 'https://jitpack.io' }
+    }
+}
+```
+2. Add the dependency:
+```
+dependencies {
+    implementation 'com.github.ArtemiyDmtrvch:flow:1+'
+}
+```
