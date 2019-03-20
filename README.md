@@ -4,24 +4,30 @@
 
 ![](https://www.railjournal.com/images/China-Olympic-EMU-LARGE.jpg "Let your project drive on rails!")
 
-**Flow** is a versatile and easy-to-use architecture component that solves very common problems of Android development. Any Android project has many logical components (Activities, Fragments, Services, Views, etc.) that interact with each other in many different ways. But at the same time, they all perform one common business process, which is mixed with a bunch of technical logic. Because of this:
+**Flow** is a versatile and easy-to-use architecture component that solves very common problems of Android development. 
+Any Android project has many logical components (Activities, Fragments, Services, Views, etc.) that interact with each 
+other in many different ways. But at the same time, they all perform one common business process, which is mixed with a 
+bunch of technical logic. Because of this:
 - it becomes difficult to track the sequence of actions
 - even minor changes to one of the components may cause the unexpected behavior of the other
 - if the project is large, you will waste a lot of time to find the place you need
 
-**Flow** will save you from all these problems by bringing out the flowchart of your business process, which is designed to be understood by all. Take a look:
+**Flow** will save you from all these problems by bringing out the flowchart of your business process, which is designed
+ to be understood by all. Take a look:
 
 ``` kotlin
-ifEventOccurs<AppStarted> {
+whenEventOccurs<AppStarted> {
     performAction(LoadData())
 }
-ifEventOccurs<DataLoaded> { event ->
+whenEventOccurs<DataLoaded> { event ->
     performAction(ShowData(event.data))
 }
 ```
 Even a person far from programming can figure it out, right? 
 
-Then you create your logical components that are just the performers of your flowchart. Therefore, they work independently of each other and can be considered as plug-ins that can be easily replaced or modified. And so trivially they are associated with a flowchart:
+Then you create your logical components that are just the performers of your flowchart. Therefore, they work 
+independently of each other and can be considered as plug-ins that can be easily replaced or modified. And so trivially 
+they are associated with a flowchart:
 
 ``` kotlin
 //Component №1
@@ -40,7 +46,7 @@ override fun performAction(action: Flow.Action) {
 //Component №2
 
 override fun performAction(action: Flow.Action) {
-    when(action) {
+    when (action) {
         is LoadData -> eventOccurred(DataLoaded("Hello world!"))
     }
 }

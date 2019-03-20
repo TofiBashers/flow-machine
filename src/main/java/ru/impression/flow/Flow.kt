@@ -10,7 +10,7 @@ abstract class Flow<S>(val state: S) {
 
     abstract fun start()
 
-    protected inline fun <reified E : Event> ifEventOccurs(crossinline onEvent: (E) -> Unit) {
+    protected inline fun <reified E : Event> whenEventOccurs(crossinline onEvent: (E) -> Unit) {
         javaClass.canonicalName?.let { thisName ->
             EVENT_SUBJECTS[thisName]?.let { eventSubject ->
                 eventSubject
@@ -22,7 +22,7 @@ abstract class Flow<S>(val state: S) {
         }
     }
 
-    protected inline fun <reified E1 : Event, reified E2 : Event> ifSeriesOfEventsOccurs(
+    protected inline fun <reified E1 : Event, reified E2 : Event> whenSeriesOfEventsOccur(
         crossinline onSeriesOfEvents: (E1, E2) -> Unit
     ) {
         javaClass.canonicalName?.let { thisName ->
@@ -46,7 +46,7 @@ abstract class Flow<S>(val state: S) {
         }
     }
 
-    protected inline fun <reified E1 : Event, reified E2 : Event, reified E3 : Event> ifSeriesOfEventsOccurs(
+    protected inline fun <reified E1 : Event, reified E2 : Event, reified E3 : Event> whenSeriesOfEventsOccur(
         crossinline onSeriesOfEvents: (E1, E2, E3) -> Unit
     ) {
         javaClass.canonicalName?.let { thisName ->
@@ -73,7 +73,7 @@ abstract class Flow<S>(val state: S) {
         }
     }
 
-    protected inline fun <reified E1 : Event, reified E2 : Event, reified E3 : Event, reified E4 : Event> ifSeriesOfEventsOccurs(
+    protected inline fun <reified E1 : Event, reified E2 : Event, reified E3 : Event, reified E4 : Event> whenSeriesOfEventsOccur(
         crossinline onSeriesOfEvents: (E1, E2, E3, E4) -> Unit
     ) {
         javaClass.canonicalName?.let { thisName ->
