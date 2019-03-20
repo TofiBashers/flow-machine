@@ -1,9 +1,9 @@
-package ru.impression.flow.impl
+package ru.impression.flow_machine.impl
 
 import android.app.Application
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProvider
-import ru.impression.flow.Flow
+import ru.impression.flow_machine.Flow
 
 class FlowViewModelFactory<F : Flow<*>>(private val application: Application, private val flowClass: Class<F>) :
     ViewModelProvider.AndroidViewModelFactory(application) {

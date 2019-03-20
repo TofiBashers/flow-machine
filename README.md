@@ -4,16 +4,16 @@
 
 <img src="https://www.railjournal.com/images/China-Olympic-EMU-LARGE.jpg" alt="Let your project drive on rails!" height="200"/>
 
-**Flow** is a versatile and easy-to-use architecture component that solves very common problems of Android development. 
-Any Android project has many logical components (Activities, Fragments, Services, Views, etc.) that interact with each 
-other in many different ways. But at the same time, they all perform one common business process, which is mixed with a 
-bunch of technical logic. Because of this:
+**flow-machine** is a versatile and easy-to-use architecture component that solves very common problems of Android 
+development. Any Android project has many logical components (Activities, Fragments, Services, Views, etc.) that 
+interact with each other in many different ways. But at the same time, they all perform one common business process, 
+which is mixed with a bunch of technical logic. Because of this:
 - it becomes difficult to track the sequence of actions
 - even minor changes to one of the components may cause the unexpected behavior of the other
 - if the project is large, you will waste a lot of time to find the place you need
 
-**Flow** will save you from all these problems by bringing out the flowchart of your business process, which is designed
- to be understood by all. Take a look:
+**flow-machine** will save you from all these problems by bringing out the flowchart of your business process, which is 
+designed to be understood by all. Take a look:
 
 ``` kotlin
 whenEventOccurs<AppStarted> {

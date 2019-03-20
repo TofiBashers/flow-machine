@@ -1,4 +1,4 @@
-package ru.impression.flow
+package ru.impression.flow_machine
 
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction

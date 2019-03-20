@@ -1,14 +1,16 @@
-package ru.impression.flow.impl
+package ru.impression.flow_machine.impl
 
-import android.arch.lifecycle.ViewModel
+import android.app.Application
+import android.arch.lifecycle.AndroidViewModel
 import io.reactivex.subjects.BehaviorSubject
-import ru.impression.flow.Flow
-import ru.impression.flow.FlowInitiator
-import ru.impression.flow.FlowPerformer
+import ru.impression.flow_machine.Flow
+import ru.impression.flow_machine.FlowInitiator
+import ru.impression.flow_machine.FlowPerformer
 
-abstract class FlowInitiatingViewModel<F : Flow<*>>(
+abstract class FlowInitiatingAndroidViewModel<F : Flow<*>>(
+    application: Application,
     final override val flowClass: Class<F>
-) : ViewModel(), FlowInitiator<F>, FlowPerformer<F> {
+) : AndroidViewModel(application), FlowInitiator<F>, FlowPerformer<F> {
 
     internal val viewEnrichEventSubject = BehaviorSubject.create<Flow.Event>()
 

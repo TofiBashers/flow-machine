@@ -1,10 +1,10 @@
-package ru.impression.flow.impl
+package ru.impression.flow_machine.impl
 
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.View
-import ru.impression.flow.Flow
-import ru.impression.flow.FlowPerformer
+import ru.impression.flow_machine.Flow
+import ru.impression.flow_machine.FlowPerformer
 
 abstract class FlowFragment<F : Flow<*>>(override val flowClass: Class<F>) : Fragment(), FlowPerformer<F> {
 

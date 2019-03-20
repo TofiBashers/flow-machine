@@ -1,34 +1,30 @@
-package ru.impression.flow.impl
+package ru.impression.flow_machine.impl
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v4.app.Fragment
-import android.view.View
+import android.support.v7.app.AppCompatActivity
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.schedulers.Schedulers
-import ru.impression.flow.DISPOSABLES
-import ru.impression.flow.Flow
-import ru.impression.flow.FlowPerformer
+import ru.impression.flow_machine.DISPOSABLES
+import ru.impression.flow_machine.Flow
+import ru.impression.flow_machine.FlowPerformer
 
-abstract class FlowFragmentWithViewModel<F : Flow<*>, M : ViewModel>(
+abstract class FlowActivityWithViewModel<F : Flow<*>, M : ViewModel>(
     override val flowClass: Class<F>,
     val viewModelClass: Class<M>
-) : Fragment(), FlowPerformer<F> {
+) : AppCompatActivity(), FlowPerformer<F> {
 
     lateinit var viewModel: M
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
         initViewModel()
         attachToFlow()
     }
 
     private fun initViewModel() {
-        viewModel = ViewModelProviders.of(
-            this,
-            FlowViewModelFactory(activity!!.application, flowClass)
-        )[viewModelClass]
+        viewModel = ViewModelProviders.of(this, FlowViewModelFactory(application, flowClass))[viewModelClass]
         when {
             FlowViewModel::class.java.isAssignableFrom(viewModelClass) ->
                 (viewModel as FlowViewModel<*>).viewEnrichEventSubject
@@ -55,8 +51,8 @@ abstract class FlowFragmentWithViewModel<F : Flow<*>, M : ViewModel>(
         super.eventOccurred(event)
     }
 
-    override fun onDestroyView() {
+    override fun onDestroy() {
         detachFromFlow()
-        super.onDestroyView()
+        super.onDestroy()
     }
 }
