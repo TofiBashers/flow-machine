@@ -2,7 +2,7 @@
 
 **Be calm for your project — let it drive on rails!**
 
-<img src="https://www.railjournal.com/images/China-Olympic-EMU-LARGE.jpg" alt="Let your project drive on rails!" height="200"/>
+<img src="https://www.railjournal.com/images/China-Olympic-EMU-LARGE.jpg" alt="Let your project drive on rails!" height="55%" width="55%"/>
 
 **Flow** is a versatile and easy-to-use architecture component that solves very common problems of Android development. 
 Any Android project has many logical components (Activities, Fragments, Services, Views, etc.) that interact with each 
@@ -26,13 +26,13 @@ whenEventOccurs<DataLoaded> { event ->
 Even a person far from programming can figure it out, right? 
 
 Then you create your logical components that are just the performers of your flowchart. Therefore, they work 
-independently of each other and can be considered as plug-ins that can be easily replaced or modified. And so trivially 
-they are associated with a flowchart:
+independently of each other and can be considered as plug-ins that are easy to edit or replace. And so trivially 
+they are associated with the flowchart:
 
 ``` kotlin
 //Component №1
 
- fun main() {
+fun main() {
     eventOccurred(AppStarted())
 }
 
