@@ -4,8 +4,6 @@
 
 <img src="https://www.railjournal.com/images/China-Olympic-EMU-LARGE.jpg" alt="Let your project drive on rails!" height="200"/>
 
-![](https://www.railjournal.com/images/China-Olympic-EMU-LARGE.jpg "Let your project drive on rails!")
-
 **Flow** is a versatile and easy-to-use architecture component that solves very common problems of Android development. Any Android project has many logical components (Activities, Fragments, Services, Views, etc.) that interact with each other in many different ways. But at the same time, they all perform one common business process, which is mixed with a bunch of technical logic. Because of this:
 - it becomes difficult to track the sequence of actions
 - even minor changes to one of the components may cause the unexpected behavior of the other
