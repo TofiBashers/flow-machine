@@ -12,13 +12,17 @@ import ru.impression.flow_machine.Flow
 import ru.impression.flow_machine.FlowPerformer
 
 abstract class FlowFragmentWithViewModel<F : Flow<*>, M : ViewModel>(
-    override val flowClass: Class<F>,
+    final override val flowClass: Class<F>,
     private val viewModelClass: Class<M>
 ) : Fragment(), FlowPerformer<F> {
 
     open val eventEnrichers: List<FlowPerformer<F>> = emptyList()
 
     lateinit var viewModel: M
+
+    final override fun attachToFlow() = super.attachToFlow()
+
+    final override fun detachFromFlow() = super.detachFromFlow()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
@@ -29,7 +33,7 @@ abstract class FlowFragmentWithViewModel<F : Flow<*>, M : ViewModel>(
         attachToFlow()
     }
 
-    override fun eventOccurred(event: Flow.Event) {
+    final override fun eventOccurred(event: Flow.Event) {
         eventEnrichers.forEach { it.enrichEvent(event) }
         super.eventOccurred(event)
     }

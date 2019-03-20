@@ -11,11 +11,13 @@ abstract class FlowViewModel<F : Flow<*>>(final override val flowClass: Class<F>
 
     final override fun attachToFlow() = super.attachToFlow()
 
+    final override fun detachFromFlow() = super.detachFromFlow()
+
     init {
         attachToFlow()
     }
 
-    override fun eventOccurred(event: Flow.Event) {
+    final override fun eventOccurred(event: Flow.Event) {
         eventEnrichers.forEach { it.enrichEvent(event) }
         super.eventOccurred(event)
     }
