@@ -11,6 +11,7 @@ interface FlowPerformer<F : Flow<*>> {
     fun attachToFlow() {
         flowClass.canonicalName?.let { flowName ->
             javaClass.canonicalName?.let { thisName ->
+                DISPOSABLES[thisName]?.dispose()
                 DISPOSABLES[thisName] = CompositeDisposable().apply {
                     ACTION_SUBJECTS[flowName]?.let { actionSubject ->
                         add(

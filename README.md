@@ -52,7 +52,7 @@ override fun performAction(action: Flow.Action) {
 }
 ```
 
-As a result:
+With this approach:
 - you think much less when writing the business logic of your app, especially if you have an analytical flowchart
 - regardless of your experience, you can easily navigate the project of any complexity
 - you can make any changes to the logical components, replace them, and not worry about the consequences
