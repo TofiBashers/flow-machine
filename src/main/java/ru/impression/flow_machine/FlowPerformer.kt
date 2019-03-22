@@ -8,6 +8,8 @@ interface FlowPerformer<F : Flow<*>> {
 
     val flowClass: Class<F>
 
+    val eventEnrichers: List<FlowPerformer<F>> get() = emptyList()
+
     fun attachToFlow() {
         flowClass.canonicalName?.let { flowName ->
             javaClass.canonicalName?.let { thisName ->
@@ -27,6 +29,7 @@ interface FlowPerformer<F : Flow<*>> {
     }
 
     fun eventOccurred(event: Flow.Event) {
+        eventEnrichers.forEach { it.enrichEvent(event) }
         flowClass.canonicalName?.let { flowName ->
             EVENT_SUBJECTS[flowName]?.onNext(event)
         }

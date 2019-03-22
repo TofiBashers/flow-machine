@@ -12,22 +12,19 @@ abstract class FlowInitiatingAndroidViewModel<F : Flow<*>>(
     final override val flowClass: Class<F>
 ) : AndroidViewModel(application), FlowInitiator<F>, FlowPerformer<F> {
 
-    open val eventEnrichers: List<FlowPerformer<F>> = emptyList()
-
     final override fun startFlow() = super.startFlow()
 
     final override fun attachToFlow() = super.attachToFlow()
 
+    final override fun eventOccurred(event: Flow.Event) = super.eventOccurred(event)
+
     final override fun detachFromFlow() = super.detachFromFlow()
+
+    final override fun finishFlow() = super.finishFlow()
 
     init {
         startFlow()
         attachToFlow()
-    }
-
-    final override fun eventOccurred(event: Flow.Event) {
-        eventEnrichers.forEach { it.enrichEvent(event) }
-        super.eventOccurred(event)
     }
 
     override fun onCleared() {

@@ -12,11 +12,11 @@ abstract class FlowActivityWithViewModel<F : Flow<*>, M : ViewModel>(
     private val viewModelClass: Class<M>
 ) : AppCompatActivity(), FlowPerformer<F> {
 
-    open val eventEnrichers: List<FlowPerformer<F>> = emptyList()
-
     lateinit var viewModel: M
 
     final override fun attachToFlow() = super.attachToFlow()
+
+    final override fun eventOccurred(event: Flow.Event) = super.eventOccurred(event)
 
     final override fun detachFromFlow() = super.detachFromFlow()
 
@@ -24,11 +24,6 @@ abstract class FlowActivityWithViewModel<F : Flow<*>, M : ViewModel>(
         super.onCreate(savedInstanceState)
         viewModel = ViewModelProviders.of(this, FlowViewModelFactory(application, flowClass))[viewModelClass]
         attachToFlow()
-    }
-
-    final override fun eventOccurred(event: Flow.Event) {
-        eventEnrichers.forEach { it.enrichEvent(event) }
-        super.eventOccurred(event)
     }
 
     override fun onDestroy() {
