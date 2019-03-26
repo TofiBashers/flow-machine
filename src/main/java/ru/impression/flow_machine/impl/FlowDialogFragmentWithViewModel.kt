@@ -3,7 +3,7 @@ package ru.impression.flow_machine.impl
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v4.app.Fragment
+import android.support.v4.app.DialogFragment
 import android.view.View
 import ru.impression.flow_machine.Flow
 import ru.impression.flow_machine.FlowPerformer
@@ -11,7 +11,7 @@ import ru.impression.flow_machine.FlowPerformer
 abstract class FlowDialogFragmentWithViewModel<F : Flow<*>, M : ViewModel>(
     final override val flowClass: Class<F>,
     private val viewModelClass: Class<M>
-) : Fragment(), FlowPerformer<F> {
+) : DialogFragment(), FlowPerformer<F> {
 
     lateinit var viewModel: M
 
