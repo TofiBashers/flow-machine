@@ -1,19 +1,18 @@
-package ru.impression.mindflow.impl.display_layer
+package ru.impression.mindflow.impl.data_display_layer
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
-import android.view.View
+import android.support.v7.app.AppCompatActivity
 import ru.impression.mindflow.FlowEvent
 import ru.impression.mindflow.FlowStep
 import ru.impression.mindflow.FlowPerformer
-import ru.impression.mindflow.impl.processing_layer.FlowViewModelFactory
+import ru.impression.mindflow.impl.data_processing_layer.FlowViewModelFactory
 
-abstract class FlowDialogFragmentWithViewModel<F : FlowStep, M : ViewModel>(
+abstract class FlowActivityWithViewModel<F : FlowStep, M : ViewModel>(
     final override val flowStepClass: Class<F>,
     private val viewModelClass: Class<M>
-) : DialogFragment(), FlowPerformer<F> {
+) : AppCompatActivity(), FlowPerformer<F> {
 
     lateinit var viewModel: M
 
@@ -23,17 +22,16 @@ abstract class FlowDialogFragmentWithViewModel<F : FlowStep, M : ViewModel>(
 
     final override fun detachFromFlow() = super.detachFromFlow()
 
-    override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
-        super.onViewCreated(view, savedInstanceState)
-        viewModel = ViewModelProviders.of(
-            this,
-            FlowViewModelFactory(activity!!.application, flowStepClass)
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        viewModel = ViewModelProviders.of(this,
+            FlowViewModelFactory(application, flowStepClass)
         )[viewModelClass]
         attachToFlow()
     }
 
-    override fun onDestroyView() {
+    override fun onDestroy() {
         detachFromFlow()
-        super.onDestroyView()
+        super.onDestroy()
     }
 }

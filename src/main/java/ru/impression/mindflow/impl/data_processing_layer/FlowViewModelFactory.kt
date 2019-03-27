@@ -1,4 +1,4 @@
-package ru.impression.mindflow.impl.processing_layer
+package ru.impression.mindflow.impl.data_processing_layer
 
 import android.app.Application
 import android.arch.lifecycle.ViewModel
