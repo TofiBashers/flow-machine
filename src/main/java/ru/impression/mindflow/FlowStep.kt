@@ -107,7 +107,7 @@ abstract class FlowStep {
         javaClass.canonicalName?.let { thisName ->
             ACTION_SUBJECTS[thisName]?.onNext(action)
         }
-        if (action is MoveToNextFlowStep) {
+        if (action is MoveToNextFlowStep<*>) {
             Flow.moveToStep(javaClass, action.nextFlowStepClass)
         }
     }

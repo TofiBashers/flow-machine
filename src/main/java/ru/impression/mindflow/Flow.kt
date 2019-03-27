@@ -5,9 +5,9 @@ import io.reactivex.subjects.BehaviorSubject
 
 object Flow {
 
-    fun start(initialStepClass: Class<FlowStep>) = moveToStep(null, initialStepClass)
+    fun <F : FlowStep> start(initialStepClass: Class<F>) = moveToStep(null, initialStepClass)
 
-    internal fun moveToStep(previousStepClass: Class<FlowStep>?, nextStepClass: Class<FlowStep>) {
+    internal fun <F : FlowStep> moveToStep(previousStepClass: Class<FlowStep>?, nextStepClass: Class<F>) {
         previousStepClass?.canonicalName?.let { previousStepName ->
             DISPOSABLES[previousStepName]?.dispose()
             DISPOSABLES.remove(previousStepName)
