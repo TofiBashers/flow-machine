@@ -1,17 +1,17 @@
-package ru.impression.flow_machine.impl
+package ru.impression.mindflow.impl.display_layer
 
 import android.os.Bundle
-import android.support.v4.app.DialogFragment
+import android.support.v4.app.Fragment
 import android.view.View
-import ru.impression.flow_machine.Flow
-import ru.impression.flow_machine.FlowPerformer
+import ru.impression.mindflow.FlowEvent
+import ru.impression.mindflow.FlowStep
+import ru.impression.mindflow.FlowPerformer
 
-abstract class FlowDialogFragment<F : Flow<*>>(final override val flowClass: Class<F>) :
-    DialogFragment(), FlowPerformer<F> {
+abstract class FlowFragment<F : FlowStep>(final override val flowStepClass: Class<F>) : Fragment(), FlowPerformer<F> {
 
     final override fun attachToFlow() = super.attachToFlow()
 
-    final override fun eventOccurred(event: Flow.Event) = super.eventOccurred(event)
+    final override fun eventOccurred(event: FlowEvent) = super.eventOccurred(event)
 
     final override fun detachFromFlow() = super.detachFromFlow()
 

@@ -1,4 +1,4 @@
-package ru.impression.flow_machine
+package ru.impression.mindflow
 
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.subjects.BehaviorSubject
@@ -8,6 +8,6 @@ import java.util.concurrent.ConcurrentHashMap
 internal val DISPOSABLES: ConcurrentHashMap<String, CompositeDisposable> = ConcurrentHashMap()
 
 @PublishedApi
-internal val EVENT_SUBJECTS: ConcurrentHashMap<String, BehaviorSubject<Flow.Event>> = ConcurrentHashMap()
+internal val EVENT_SUBJECTS: ConcurrentHashMap<String, BehaviorSubject<FlowEvent>> = ConcurrentHashMap()
 
-internal val ACTION_SUBJECTS: ConcurrentHashMap<String, BehaviorSubject<Flow.Action>> = ConcurrentHashMap()
+internal val ACTION_SUBJECTS: ConcurrentHashMap<String, BehaviorSubject<FlowAction>> = ConcurrentHashMap()

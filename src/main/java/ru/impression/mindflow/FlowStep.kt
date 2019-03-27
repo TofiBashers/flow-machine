@@ -1,4 +1,4 @@
-package ru.impression.flow_machine
+package ru.impression.mindflow
 
 import io.reactivex.Observable
 import io.reactivex.functions.BiFunction
@@ -6,11 +6,11 @@ import io.reactivex.functions.Function3
 import io.reactivex.functions.Function4
 import io.reactivex.schedulers.Schedulers
 
-abstract class Flow<S>(val state: S) {
+abstract class FlowStep {
 
     abstract fun start()
 
-    protected inline fun <reified E : Event> whenEventOccurs(crossinline onEvent: (E) -> Unit) {
+    protected inline fun <reified E : FlowEvent> whenEventOccurs(crossinline onEvent: (E) -> Unit) {
         javaClass.canonicalName?.let { thisName ->
             EVENT_SUBJECTS[thisName]?.let { eventSubject ->
                 eventSubject
@@ -22,7 +22,7 @@ abstract class Flow<S>(val state: S) {
         }
     }
 
-    protected inline fun <reified E1 : Event, reified E2 : Event> whenSeriesOfEventsOccur(
+    protected inline fun <reified E1 : FlowEvent, reified E2 : FlowEvent> whenSeriesOfEventsOccur(
         crossinline onSeriesOfEvents: (E1, E2) -> Unit
     ) {
         javaClass.canonicalName?.let { thisName ->
@@ -46,7 +46,7 @@ abstract class Flow<S>(val state: S) {
         }
     }
 
-    protected inline fun <reified E1 : Event, reified E2 : Event, reified E3 : Event> whenSeriesOfEventsOccur(
+    protected inline fun <reified E1 : FlowEvent, reified E2 : FlowEvent, reified E3 : FlowEvent> whenSeriesOfEventsOccur(
         crossinline onSeriesOfEvents: (E1, E2, E3) -> Unit
     ) {
         javaClass.canonicalName?.let { thisName ->
@@ -73,7 +73,7 @@ abstract class Flow<S>(val state: S) {
         }
     }
 
-    protected inline fun <reified E1 : Event, reified E2 : Event, reified E3 : Event, reified E4 : Event> whenSeriesOfEventsOccur(
+    protected inline fun <reified E1 : FlowEvent, reified E2 : FlowEvent, reified E3 : FlowEvent, reified E4 : FlowEvent> whenSeriesOfEventsOccur(
         crossinline onSeriesOfEvents: (E1, E2, E3, E4) -> Unit
     ) {
         javaClass.canonicalName?.let { thisName ->
@@ -103,13 +103,13 @@ abstract class Flow<S>(val state: S) {
         }
     }
 
-    protected fun performAction(action: Action) {
+    protected fun performAction(action: FlowAction) {
         javaClass.canonicalName?.let { thisName ->
             ACTION_SUBJECTS[thisName]?.onNext(action)
         }
+        if (action is MoveToNextFlowStep) {
+            Flow.moveToStep(javaClass, action.nextFlowStepClass)
+        }
     }
 
-    abstract class Event
-
-    abstract class Action
 }

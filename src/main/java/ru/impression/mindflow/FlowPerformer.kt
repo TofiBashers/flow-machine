@@ -1,21 +1,21 @@
-package ru.impression.flow_machine
+package ru.impression.mindflow
 
 import io.reactivex.android.schedulers.AndroidSchedulers
 import io.reactivex.disposables.CompositeDisposable
 import io.reactivex.schedulers.Schedulers
 
-interface FlowPerformer<F : Flow<*>> {
+interface FlowPerformer<F : FlowStep> {
 
-    val flowClass: Class<F>
+    val flowStepClass: Class<F>
 
     val eventEnrichers: List<FlowPerformer<F>> get() = emptyList()
 
     fun attachToFlow() {
-        flowClass.canonicalName?.let { flowName ->
+        flowStepClass.canonicalName?.let { stepName ->
             javaClass.canonicalName?.let { thisName ->
                 DISPOSABLES[thisName]?.dispose()
                 DISPOSABLES[thisName] = CompositeDisposable().apply {
-                    ACTION_SUBJECTS[flowName]?.let { actionSubject ->
+                    ACTION_SUBJECTS[stepName]?.let { actionSubject ->
                         add(
                             actionSubject
                                 .subscribeOn(Schedulers.newThread())
@@ -28,16 +28,16 @@ interface FlowPerformer<F : Flow<*>> {
         }
     }
 
-    fun eventOccurred(event: Flow.Event) {
+    fun eventOccurred(event: FlowEvent) {
         eventEnrichers.forEach { it.enrichEvent(event) }
-        flowClass.canonicalName?.let { flowName ->
-            EVENT_SUBJECTS[flowName]?.onNext(event)
+        flowStepClass.canonicalName?.let { stepName ->
+            EVENT_SUBJECTS[stepName]?.onNext(event)
         }
     }
 
-    fun enrichEvent(event: Flow.Event) = Unit
+    fun enrichEvent(event: FlowEvent) = Unit
 
-    fun performAction(action: Flow.Action) = Unit
+    fun performAction(action: FlowAction) = Unit
 
     fun detachFromFlow() {
         javaClass.canonicalName?.let { thisName ->

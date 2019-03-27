@@ -1,18 +1,17 @@
-package ru.impression.flow_machine.impl
+package ru.impression.mindflow.impl.display_layer
 
 import android.arch.lifecycle.ViewModel
 import android.arch.lifecycle.ViewModelProviders
 import android.os.Bundle
 import android.support.v4.app.Fragment
 import android.view.View
-import io.reactivex.android.schedulers.AndroidSchedulers
-import io.reactivex.schedulers.Schedulers
-import ru.impression.flow_machine.DISPOSABLES
-import ru.impression.flow_machine.Flow
-import ru.impression.flow_machine.FlowPerformer
+import ru.impression.mindflow.FlowEvent
+import ru.impression.mindflow.FlowStep
+import ru.impression.mindflow.FlowPerformer
+import ru.impression.mindflow.impl.processing_layer.FlowViewModelFactory
 
-abstract class FlowFragmentWithViewModel<F : Flow<*>, M : ViewModel>(
-    final override val flowClass: Class<F>,
+abstract class FlowFragmentWithViewModel<F : FlowStep, M : ViewModel>(
+    final override val flowStepClass: Class<F>,
     private val viewModelClass: Class<M>
 ) : Fragment(), FlowPerformer<F> {
 
@@ -20,7 +19,7 @@ abstract class FlowFragmentWithViewModel<F : Flow<*>, M : ViewModel>(
 
     final override fun attachToFlow() = super.attachToFlow()
 
-    final override fun eventOccurred(event: Flow.Event) = super.eventOccurred(event)
+    final override fun eventOccurred(event: FlowEvent) = super.eventOccurred(event)
 
     final override fun detachFromFlow() = super.detachFromFlow()
 
@@ -28,7 +27,7 @@ abstract class FlowFragmentWithViewModel<F : Flow<*>, M : ViewModel>(
         super.onViewCreated(view, savedInstanceState)
         viewModel = ViewModelProviders.of(
             this,
-            FlowViewModelFactory(activity!!.application, flowClass)
+            FlowViewModelFactory(activity!!.application, flowStepClass)
         )[viewModelClass]
         attachToFlow()
     }
