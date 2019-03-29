@@ -14,9 +14,11 @@ abstract class Flow<S>(val state: S) {
         javaClass.canonicalName?.let { thisName ->
             EVENT_SUBJECTS[thisName]?.let { eventSubject ->
                 eventSubject
+                    .filter { it is E }
+                    .map { it as E }
                     .subscribeOn(Schedulers.newThread())
                     .observeOn(Schedulers.newThread())
-                    .subscribe({ event -> if (event is E) onEvent(event) }) { throw  it }
+                    .subscribe({ event -> onEvent(event) }) { throw  it }
                     .let { disposable -> DISPOSABLES[thisName]?.add(disposable) }
             }
         }
