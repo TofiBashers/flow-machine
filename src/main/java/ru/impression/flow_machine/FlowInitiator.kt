@@ -11,8 +11,8 @@ interface FlowInitiator<F : Flow<*>> {
             DISPOSABLES[flowName]?.let { return }
             val flowInstance = flowClass.newInstance()
             DISPOSABLES[flowName] = CompositeDisposable()
-            EVENT_SUBJECTS[flowName] = createSubjectForHoldItemsCount(holdLastEventsCount)
-            ACTION_SUBJECTS[flowName] = createSubjectForHoldItemsCount(holdLastEventsCount)
+            EVENT_SUBJECTS[flowName] = createSubjectForBufferedItemsCount(holdLastEventsCount)
+            ACTION_SUBJECTS[flowName] = createSubjectForBufferedItemsCount(holdLastEventsCount)
             flowInstance.start()
         }
     }
