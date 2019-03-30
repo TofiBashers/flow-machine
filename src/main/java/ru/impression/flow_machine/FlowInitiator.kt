@@ -1,8 +1,6 @@
 package ru.impression.flow_machine
 
 import io.reactivex.disposables.CompositeDisposable
-import io.reactivex.subjects.PublishSubject
-import io.reactivex.subjects.ReplaySubject
 
 interface FlowInitiator<F : Flow<*>> {
 
@@ -13,14 +11,8 @@ interface FlowInitiator<F : Flow<*>> {
             DISPOSABLES[flowName]?.let { return }
             val flowInstance = flowClass.newInstance()
             DISPOSABLES[flowName] = CompositeDisposable()
-            EVENT_SUBJECTS[flowName] = if (holdLastEventsCount == 0)
-                PublishSubject.create()
-            else
-                ReplaySubject.createWithSize(holdLastEventsCount)
-            ACTION_SUBJECTS[flowName] = if (holdLastEventsCount == 0)
-                PublishSubject.create()
-            else
-                ReplaySubject.createWithSize(holdLastActionsCount)
+            EVENT_SUBJECTS[flowName] = createSubjectForHoldItemsCount(holdLastEventsCount)
+            ACTION_SUBJECTS[flowName] = createSubjectForHoldItemsCount(holdLastEventsCount)
             flowInstance.start()
         }
     }
